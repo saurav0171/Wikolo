@@ -108,7 +108,9 @@ class _ChoosePlanState extends State<ChoosePlan> {
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                           child: const Text('Skip & Post',
                               style: TextStyle(
                                   fontSize: 16,

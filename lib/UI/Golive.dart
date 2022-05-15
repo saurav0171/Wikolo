@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:wikolo/CommonFiles/common.dart';
 
 class GoLive extends StatelessWidget {
-  const GoLive({Key? key}) : super(key: key);
+  bool isGoLive;
+  GoLive({Key? key, required this.isGoLive}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +34,16 @@ class GoLive extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: GoLiveExtension(),
+      body: GoLiveExtension(
+        isGoLive: isGoLive,
+      ),
     ));
   }
 }
 
 class GoLiveExtension extends StatefulWidget {
-  const GoLiveExtension({Key? key}) : super(key: key);
+  bool isGoLive;
+  GoLiveExtension({Key? key, required this.isGoLive}) : super(key: key);
 
   @override
   State<GoLiveExtension> createState() => _GoLiveExtensionState();
@@ -348,7 +352,8 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
           Visibility(
             visible: letUserJoin,
             child: Padding(
-              padding: EdgeInsets.only(top: 10.0, left: 30.0, right: 30.0),
+              padding: EdgeInsets.only(
+                  top: 10.0, left: 30.0, right: 30.0, bottom: 20),
               child: Container(
                 padding: EdgeInsets.only(top: 0.0),
                 height: 50.0,
@@ -406,7 +411,9 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
+      height: widget.isGoLive
+          ? MediaQuery.of(context).size.height
+          : MediaQuery.of(context).size.height - 120,
       decoration: BoxDecoration(
           // color: Color.fromRGBO(252, 252, 252, 1),
           ),

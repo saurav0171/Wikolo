@@ -383,7 +383,7 @@ class _UsingVideoControllerExampleState
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        backgroundColor: colorLocalPink.withOpacity(0.6),
+        backgroundColor: colorLocalPink.withOpacity(0.5),
         onPressed: () {
           Navigator.pop(context);
         },

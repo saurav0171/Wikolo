@@ -1,10 +1,10 @@
+// ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 
 class SocialCategory extends StatelessWidget {
-
   final myImageAndCaption = [
-    [ "All"],
-    [ "Books"],
+    ["All"],
+    ["Books"],
     ["Electronics"],
     ["Games"],
     ["Music"],
@@ -52,9 +52,7 @@ class SocialCategory extends StatelessWidget {
               height: 40,
               minWidth: 40,
               textColor: Colors.white,
-              onPressed: () {
-
-              },
+              onPressed: () {},
               child: Text(""),
               shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
             ),
@@ -63,41 +61,35 @@ class SocialCategory extends StatelessWidget {
             color: Colors.black,
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Center(child: Text('Categories', style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Quicksand',
-            fontWeight: FontWeight.bold,
-          ),
-          ),
+          title: Center(
+            child: Text(
+              'Categories',
+              style: TextStyle(
+                color: Colors.black,
+                fontFamily: 'Quicksand',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
         body: Container(
-          padding:  EdgeInsets.only(top: 10.0,left: 10.0,right: 10.0),
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
+          padding: EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             color: Color.fromRGBO(252, 252, 252, 1),
           ),
-
           child: GridView.count(
             mainAxisSpacing: 4,
             crossAxisSpacing: 5,
-            childAspectRatio: 2/1.3,
+            childAspectRatio: 2 / 1.3,
             crossAxisCount: 4,
             children: [
               ...myImageAndCaption.map(
-                    (i) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                (i) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-
-
                     Container(
                       height: 40,
                       width: 80,
@@ -114,12 +106,14 @@ class SocialCategory extends StatelessWidget {
                         ],
                       ),
                       child: Center(
-                      child: Text(i.first,style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontFamily: 'Quicksand',
-                        fontWeight: FontWeight.bold,
-                        ),
+                        child: Text(
+                          i.first,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                            fontFamily: 'Quicksand',
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     )
