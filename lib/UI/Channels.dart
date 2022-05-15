@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
-import 'socialcategory.dart';
+import 'SocialCategory.dart';
 
 class Channels extends StatelessWidget {
   @override

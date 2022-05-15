@@ -8,6 +8,8 @@ import 'package:wikolo/UI/Golive.dart';
 import 'package:wikolo/UI/ImageDetails.dart';
 import 'package:wikolo/UI/ImagePostDetails.dart';
 import 'package:wikolo/UI/ImagesProfileDetails.dart';
+import 'package:wikolo/UI/LiveStreamingDetails.dart';
+import 'package:wikolo/UI/Uploadpost.dart';
 import 'package:wikolo/UI/VideoDetails.dart';
 import 'package:wikolo/UI/VideoPlayerScreen.dart';
 
@@ -785,6 +787,15 @@ class _SocialBoardState extends State<SocialBoard> {
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Colors.white,
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UploadPost()),
+              );
+            },
+            backgroundColor: colorLocalPink.withOpacity(0.5),
+            child: Icon(Icons.add)),
         body: NestedScrollView(
           headerSliverBuilder:
               (BuildContext buildcontext, bool innerBoxIsScrolled) {
@@ -1384,16 +1395,13 @@ class _SocialBoardState extends State<SocialBoard> {
                               ),
                               child: InkWell(
                                 onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //       builder: (context) => GoLive()),
-                                  // );
                                   Navigator.of(context).push(PageRouteBuilder(
                                       opaque: false,
                                       pageBuilder:
                                           (BuildContext context, _, __) =>
-                                              GoLive()));
+                                              GoLive(
+                                                isGoLive: true,
+                                              )));
                                 },
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1592,15 +1600,25 @@ class _SocialBoardState extends State<SocialBoard> {
                               ),
                             ),
                           ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "See All",
-                              style: TextStyle(
-                                  color: Color.fromRGBO(145, 145, 145, 1),
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        LiveStreamingDetails()),
+                              );
+                            },
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                "See All",
+                                style: TextStyle(
+                                    color: Color.fromRGBO(145, 145, 145, 1),
+                                    fontFamily: 'Quicksand',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11),
+                              ),
                             ),
                           )
                         ],
