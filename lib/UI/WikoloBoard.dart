@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
@@ -526,20 +528,20 @@ class _SocialBoardState extends State<SocialBoard> {
           ),
           title: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(
-                        Icons.arrow_back_ios_new,
-                        size: 20,
-                      )),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 80),
-                    child: Text(
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: Icon(
+                          Icons.arrow_back_ios_new,
+                          size: 20,
+                        )),
+                    Text(
                       "Looking for",
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -548,8 +550,8 @@ class _SocialBoardState extends State<SocialBoard> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
                 height: 1,
@@ -784,6 +786,7 @@ class _SocialBoardState extends State<SocialBoard> {
 
   @override
   Widget build(BuildContext context) {
+    double tileWidth = Platform.isIOS ? 70 : 65;
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Colors.white,
@@ -1218,7 +1221,7 @@ class _SocialBoardState extends State<SocialBoard> {
                               padding: EdgeInsets.only(right: 5.0),
                               child: Container(
                                 padding: EdgeInsets.only(top: 0.0),
-                                width: 70,
+                                width: tileWidth,
                                 height: 60,
                                 child: Column(
                                   children: [
@@ -1263,7 +1266,7 @@ class _SocialBoardState extends State<SocialBoard> {
                               padding: EdgeInsets.only(right: 5.0),
                               child: Container(
                                 padding: EdgeInsets.only(top: 0.0),
-                                width: 70,
+                                width: tileWidth,
                                 height: 60,
                                 child: Column(
                                   children: [
@@ -1289,7 +1292,7 @@ class _SocialBoardState extends State<SocialBoard> {
                               padding: EdgeInsets.only(right: 5.0),
                               child: Container(
                                 padding: EdgeInsets.only(top: 0.0),
-                                width: 70,
+                                width: tileWidth,
                                 height: 60,
                                 child: Column(
                                   children: [
@@ -1315,7 +1318,7 @@ class _SocialBoardState extends State<SocialBoard> {
                               padding: EdgeInsets.only(right: 5.0),
                               child: Container(
                                 padding: EdgeInsets.only(top: 0.0),
-                                width: 70,
+                                width: tileWidth,
                                 height: 60,
                                 child: Column(
                                   children: [
@@ -1341,7 +1344,7 @@ class _SocialBoardState extends State<SocialBoard> {
                               padding: EdgeInsets.only(right: 0.0),
                               child: Container(
                                 padding: EdgeInsets.only(top: 0.0),
-                                width: 70,
+                                width: tileWidth,
                                 height: 60,
                                 child: Column(
                                   children: const [

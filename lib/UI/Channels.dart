@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'SocialCategory.dart';
 
@@ -42,7 +44,7 @@ class Channels extends StatelessWidget {
             crossAxisCount: 4,
             crossAxisSpacing: 7,
             mainAxisSpacing: 10,
-            childAspectRatio: 0.7,
+            childAspectRatio: Platform.isIOS ? 0.7 : 0.6,
             padding: EdgeInsets.symmetric(horizontal: 10),
             children: [
               ...myImageAndCaption.map(

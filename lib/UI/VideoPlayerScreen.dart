@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:io';
+
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:better_player/better_player.dart';
@@ -531,7 +533,7 @@ class _UsingVideoControllerExampleState
                                   )),
                             ),
                             SizedBox(
-                              width: 40,
+                              width: Platform.isIOS ? 40 : 20,
                             ),
                             InkWell(
                                 onTap: () {},
