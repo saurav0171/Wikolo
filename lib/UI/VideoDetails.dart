@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:wikolo/CommonFiles/common.dart';
@@ -546,7 +548,7 @@ class _VideoDetailsState extends State<VideoDetails> {
   Widget _backImage() {
     return Stack(children: [
       AspectRatio(
-        aspectRatio: 1.3,
+        aspectRatio: Platform.isIOS ? 1.3 : 1.1,
         child: ClipRRect(
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(15), topRight: Radius.circular(15)),
@@ -678,7 +680,7 @@ class _VideoDetailsState extends State<VideoDetails> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 50),
+                  padding: EdgeInsets.only(left: Platform.isIOS ? 50 : 25),
                   child: Container(
                     height: 23,
                     width: 23,
@@ -713,7 +715,7 @@ class _VideoDetailsState extends State<VideoDetails> {
         itemCount: 10,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 0.8,
+            childAspectRatio: Platform.isIOS ? 0.8 : 0.7,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10),
         itemBuilder: (context, index) {

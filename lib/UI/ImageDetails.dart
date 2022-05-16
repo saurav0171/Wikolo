@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:wikolo/UI/Channels.dart';
@@ -698,7 +700,7 @@ class _ImageDetailsState extends State<ImageDetails> {
         itemCount: 10,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            childAspectRatio: 0.67,
+            childAspectRatio: Platform.isIOS ? 0.67 : 0.65,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10),
         itemBuilder: (context, index) {
