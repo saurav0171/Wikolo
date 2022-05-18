@@ -1,7 +1,17 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
+import 'package:wikolo/CommonFiles/common.dart';
 
-class SocialCategory extends StatelessWidget {
+class SocialCategory extends StatefulWidget {
+  final Function setCategory;
+  const SocialCategory({Key? key, required this.setCategory}) : super(key: key);
+
+  @override
+  State<SocialCategory> createState() => _SocialCategoryState();
+}
+
+class _SocialCategoryState extends State<SocialCategory> {
+  var selectedCategory = '';
   final myImageAndCaption = [
     ["All"],
     ["Books"],
@@ -86,38 +96,51 @@ class SocialCategory extends StatelessWidget {
             crossAxisCount: 4,
             children: [
               ...myImageAndCaption.map(
-                (i) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 40,
-                      width: 80,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 5,
-                            offset: Offset(0, 3), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          i.first,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.black,
-                            fontFamily: 'Quicksand',
-                            fontWeight: FontWeight.bold,
+                (i) => InkWell(
+                  onTap: () {
+                    setState(() {
+                      selectedCategory = i.last;
+                      widget.setCategory(selectedCategory);
+                    });
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 80,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: selectedCategory == i.last
+                              ? colorLocalPink
+                              : Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 5,
+                              blurRadius: 5,
+                              offset:
+                                  Offset(0, 3), // changes position of shadow
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            i.first,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: selectedCategory == i.last
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontFamily: 'Quicksand',
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ],

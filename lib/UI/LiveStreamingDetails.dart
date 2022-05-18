@@ -1,9 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:wikolo/UI/Channels.dart';
+import 'package:wikolo/UI/SocialCategory.dart';
 
 import '../CommonFiles/common.dart';
 
@@ -48,6 +47,11 @@ class _LiveStreamingDetailsState extends State<LiveStreamingDetails> {
     ["assets/images/ic_beauty.png", "Beauty"],
     ["assets/images/ic_car.png", "Cars & Vehicles"],
   ];
+  setCategory(String category) {
+    setState(() {
+      selectedCategory = category;
+    });
+  }
 
   Widget _buildListSampleItem(
       String title, int radioStatus, StateSetter setState) {
@@ -99,7 +103,7 @@ class _LiveStreamingDetailsState extends State<LiveStreamingDetails> {
 
   //&*** Looking for Pop Up *********************
   showPopUp(BuildContext context) {
-    return showPlatformDialog(
+    return showDialog(
       context: context,
       builder: (_) => AlertDialog(
           shape: RoundedRectangleBorder(
@@ -369,7 +373,7 @@ class _LiveStreamingDetailsState extends State<LiveStreamingDetails> {
 
   // ********* show category ***************
   showCategory(BuildContext context) {
-    return showPlatformDialog(
+    return showDialog(
       context: context,
       builder: (_) => AlertDialog(
           contentPadding: EdgeInsets.all(10),
@@ -470,7 +474,7 @@ class _LiveStreamingDetailsState extends State<LiveStreamingDetails> {
 
 // ********* show Channels ***************
   showChannels(BuildContext context) {
-    return showPlatformDialog(
+    return showDialog(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
@@ -884,7 +888,13 @@ class _LiveStreamingDetailsState extends State<LiveStreamingDetails> {
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
                       onTap: () {
-                        showCategory(context);
+                        // showCategory(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SocialCategory(
+                                      setCategory: setCategory,
+                                    )));
                       },
                       child: Text(
                         "See All",

@@ -1,9 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:wikolo/CommonFiles/common.dart';
 import 'package:wikolo/UI/ChoosePlan.dart';
 import 'package:wikolo/UI/Golive.dart';
@@ -11,6 +9,7 @@ import 'package:wikolo/UI/ImageDetails.dart';
 import 'package:wikolo/UI/ImagePostDetails.dart';
 import 'package:wikolo/UI/ImagesProfileDetails.dart';
 import 'package:wikolo/UI/LiveStreamingDetails.dart';
+import 'package:wikolo/UI/SocialCategory.dart';
 import 'package:wikolo/UI/Uploadpost.dart';
 import 'package:wikolo/UI/VideoDetails.dart';
 import 'package:wikolo/UI/VideoPlayerScreen.dart';
@@ -68,6 +67,12 @@ class _SocialBoardState extends State<SocialBoard> {
     ["Food"],
     ["Car"],
   ];
+
+  setCategory(String category) {
+    setState(() {
+      selectedCategory = category;
+    });
+  }
 
   //********************** //
   Container _buildStoryListView(context) {
@@ -290,7 +295,7 @@ class _SocialBoardState extends State<SocialBoard> {
 
   // ********* show category ***************
   showCategory(BuildContext context) {
-    return showPlatformDialog(
+    return showDialog(
       context: context,
       builder: (_) => AlertDialog(
           contentPadding: EdgeInsets.all(10),
@@ -450,7 +455,7 @@ class _SocialBoardState extends State<SocialBoard> {
   }
 
   showPopUpFilter(BuildContext context) {
-    showPlatformDialog(
+    showDialog(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
@@ -520,7 +525,7 @@ class _SocialBoardState extends State<SocialBoard> {
 
   //&*** Looking for Pop Up *********************
   showPopUp(BuildContext context) {
-    return showPlatformDialog(
+    return showDialog(
       context: context,
       builder: (_) => AlertDialog(
           shape: RoundedRectangleBorder(
@@ -1491,7 +1496,14 @@ class _SocialBoardState extends State<SocialBoard> {
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
                               onTap: () {
-                                showCategory(context);
+                                // showCategory(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SocialCategory(
+                                            setCategory: setCategory,
+                                          )),
+                                );
                               },
                               child: Text(
                                 "See All",
@@ -1509,7 +1521,7 @@ class _SocialBoardState extends State<SocialBoard> {
                     ),
 
                     Container(
-                      padding: EdgeInsets.only(top: 10),
+                      padding: EdgeInsets.only(top: 10, right: 16, left: 16),
                       height: MediaQuery.of(context).size.height * 0.08,
                       width: MediaQuery.of(context).size.width,
                       child: GridView.builder(

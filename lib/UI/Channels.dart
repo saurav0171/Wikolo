@@ -54,11 +54,11 @@ class Channels extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SocialCategory()),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) => SocialCategory()),
+                          // );
                         },
                         child: Container(
                           height: 130,
