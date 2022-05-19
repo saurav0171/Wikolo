@@ -867,7 +867,7 @@ class _ImageDetailsState extends State<ImageDetails> {
                 itemCount: myCategoryArray.length,
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 250,
-                    childAspectRatio: 3 / 5,
+                    childAspectRatio: 0.75,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 0),
                 itemBuilder: (context, index) {
@@ -970,16 +970,16 @@ class _ImageDetailsState extends State<ImageDetails> {
               ),
             ),
             Container(
-                height: 60,
+                height: 48,
                 width: MediaQuery.of(context).size.width,
                 child: Center(
                   child: GridView.builder(
                     shrinkWrap: true,
                     itemCount: 9,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        childAspectRatio: 0.36,
-                        mainAxisSpacing: 10),
+                      crossAxisCount: 1,
+                      childAspectRatio: 0.36,
+                    ),
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(
@@ -987,7 +987,7 @@ class _ImageDetailsState extends State<ImageDetails> {
                         ),
                         child: GridTile(
                           child: Padding(
-                            padding: const EdgeInsets.all(4.0),
+                            padding: const EdgeInsets.only(top: 4, bottom: 4),
                             child: InkWell(
                               onTap: () {
                                 setState(() {
@@ -995,14 +995,14 @@ class _ImageDetailsState extends State<ImageDetails> {
                                 });
                               },
                               child: Container(
-                                height: 30,
+                                height: 22,
                                 width: 130,
                                 decoration: BoxDecoration(
                                   color: channelSelectedIndex == index
                                       ? colorLocalPink
                                       : Colors.white,
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(25)),
+                                      BorderRadius.all(Radius.circular(20)),
                                   border: Border.all(color: Colors.white),
                                   boxShadow: [
                                     BoxShadow(
@@ -1020,7 +1020,7 @@ class _ImageDetailsState extends State<ImageDetails> {
                                       Container(
                                         child: InkWell(
                                           child: CircleAvatar(
-                                            radius: 25,
+                                            radius: 20,
                                             backgroundImage: AssetImage(
                                                 'assets/images/ic_demoprofile.png'),
                                           ),
@@ -1037,7 +1037,7 @@ class _ImageDetailsState extends State<ImageDetails> {
                                                     : Colors.black,
                                                 fontFamily: 'Quicksand',
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 12),
+                                                fontSize: 10),
                                           ),
                                         ),
                                       ),

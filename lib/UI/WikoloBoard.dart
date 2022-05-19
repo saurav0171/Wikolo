@@ -1529,7 +1529,7 @@ class _SocialBoardState extends State<SocialBoard> {
                         itemCount: myTextArray.length,
                         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                             maxCrossAxisExtent: 250,
-                            childAspectRatio: 3 / 5,
+                            childAspectRatio: 0.75,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 0),
                         itemBuilder: (context, index) {
