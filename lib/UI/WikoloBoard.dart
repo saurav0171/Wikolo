@@ -13,6 +13,8 @@ import 'package:wikolo/UI/SocialCategory.dart';
 import 'package:wikolo/UI/Uploadpost.dart';
 import 'package:wikolo/UI/VideoDetails.dart';
 import 'package:wikolo/UI/VideoPlayerScreen.dart';
+import 'package:wikolo/UI/addGurudwara.dart';
+import 'package:wikolo/UI/join_channel_video.dart';
 
 class SocialBoard extends StatefulWidget {
   const SocialBoard({Key? key}) : super(key: key);
@@ -799,7 +801,7 @@ class _SocialBoardState extends State<SocialBoard> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => UploadPost()),
+                MaterialPageRoute(builder: (context) => AddGurudwara()),
               );
             },
             backgroundColor: colorLocalPink.withOpacity(0.5),

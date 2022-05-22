@@ -60,6 +60,8 @@ dependencies:
   video_player: ^2.4.0
   better_player: ^0.0.82
   expandable: ^5.0.1
+  agora_rtc_engine: ^5.2.0
+  permission_handler: ^9.2.0
 
 dev_dependencies:
   flutter_test:

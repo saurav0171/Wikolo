@@ -41,6 +41,12 @@
 	<string>Wikolo wants to use you Microphone. Would you agree?</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Wikolo wants to use your Photo Library. Would you agree?</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Wikolo wants to use your Microphone. Would you agree?</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

@@ -28,7 +28,7 @@ class _ChoosePlanState extends State<ChoosePlan> {
       body: Center(
           child: CarouselSlider(
         options: CarouselOptions(
-            aspectRatio: 1.11, enlargeCenterPage: true, viewportFraction: 0.6),
+            aspectRatio: 1.35, enlargeCenterPage: true, viewportFraction: 0.6),
         items: list
             .map((item) => Container(
                   decoration: BoxDecoration(
@@ -36,6 +36,7 @@ class _ChoosePlanState extends State<ChoosePlan> {
                     color: Colors.grey.shade100,
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Container(
                         height: 70,
@@ -57,65 +58,72 @@ class _ChoosePlanState extends State<ChoosePlan> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 50),
-                        child: Container(
-                          height: 70,
-                          width: 250,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10)),
-                          ),
-                          child: Center(
-                              child: Text(
-                            item.toString(),
-                            style: const TextStyle(
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFFD1C74)),
-                          )),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Container(
-                          height: 40,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(25)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 3,
-                                blurRadius: 4,
-                                offset:
-                                    Offset(0, 2), // changes position of shadow
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 70,
+                              width: 250,
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10),
+                                    bottomRight: Radius.circular(10)),
                               ),
-                            ],
-                          ),
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Text('Choose',
-                                style: TextStyle(
-                                    fontSize: 16,
+                              child: Center(
+                                  child: Text(
+                                item.toString(),
+                                style: const TextStyle(
+                                    fontSize: 60,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black)),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('Skip & Post',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey)),
+                                    color: Color(0xFFFD1C74)),
+                              )),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Container(
+                                height: 35,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(25)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 3,
+                                      blurRadius: 4,
+                                      offset: const Offset(
+                                          0, 2), // changes position of shadow
+                                    ),
+                                  ],
+                                ),
+                                child: TextButton(
+                                  onPressed: () {},
+                                  child: const Center(
+                                    child: Text('Choose',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Skip & Post',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey)),
+                              ),
+                            )
+                          ],
                         ),
                       )
                     ],

@@ -70,7 +70,9 @@ Future<dynamic> CallApi(
           "Php-Auth-User": params["username"]
         });
       } else if (key == null) {
-        response = await http.get(Uri.parse(url + "?" + queryString));
+        response = await http.get(Uri.parse(url + "?" + queryString), headers: {
+          "Authorization": 'Token 9cccdbe7321b1e08070769ac85259bfa19388759'
+        });
       } else {
         response = await http.get(Uri.parse(url + "?" + queryString),
             headers: {"X-API-Key": key, "X-STORMBOARD-MOBILEFLUTTER": "true"});
