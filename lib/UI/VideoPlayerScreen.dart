@@ -7,6 +7,8 @@ import 'package:better_player/better_player.dart';
 import 'package:flutter/services.dart';
 import 'package:wikolo/CommonFiles/common.dart';
 
+import '../Globals/globals.dart';
+
 class UsingVideoControllerExample extends StatefulWidget {
   Function videoStatus;
   UsingVideoControllerExample({Key? key, required this.videoStatus})
@@ -18,13 +20,36 @@ class UsingVideoControllerExample extends StatefulWidget {
 }
 
 class _UsingVideoControllerExampleState
-    extends State<UsingVideoControllerExample> {
-  late BetterPlayerController _betterPlayerController;
+    extends State<UsingVideoControllerExample> with TickerProviderStateMixin {
+// Floating Video View Animation
+  late AnimationController alignmentAnimationController;
+  late Animation alignmentAnimation;
+
+  late AnimationController videoViewController;
+  late Animation videoViewAnimation;
+
+  var currentAlignment = Alignment.topCenter;
+
+  var minVideoHeight = 100.0;
+  var minVideoWidth = 150.0;
+
+  var maxVideoHeight = 200.0;
+
+  // This is an arbitrary value and will be changed when layout is built.
+  var maxVideoWidth = 250.0;
+
+  var currentVideoHeight = 200.0;
+  var currentVideoWidth = 200.0;
+
+  bool isInSmallMode = false;
+
+  var videoIndexSelected = -1;
+
   late BetterPlayerDataSource _betterPlayerDataSource;
   var likeStatus = 1; //1 for nothing, 2 for like, 3 for Unlike
   bool isCommented = false;
   ExpandableController commentController = ExpandableController();
-  GlobalKey betterPlayerKey = GlobalKey();
+
   final myCategoryArray = [
     ["All"],
     ["Books"],
@@ -34,6 +59,32 @@ class _UsingVideoControllerExampleState
 
   @override
   void initState() {
+    alignmentAnimationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1))
+          ..addListener(() {
+            setState(() {
+              currentAlignment = alignmentAnimation.value;
+            });
+          });
+    alignmentAnimation =
+        AlignmentTween(begin: Alignment.topCenter, end: Alignment.bottomRight)
+            .animate(CurvedAnimation(
+                parent: alignmentAnimationController,
+                curve: Curves.fastOutSlowIn));
+
+    videoViewController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1))
+          ..addListener(() {
+            setState(() {
+              currentVideoWidth = (maxVideoWidth * videoViewAnimation.value) +
+                  (minVideoWidth * (1.0 - videoViewAnimation.value));
+              currentVideoHeight = (maxVideoHeight * videoViewAnimation.value) +
+                  (minVideoHeight * (1.0 - videoViewAnimation.value));
+            });
+          });
+    videoViewAnimation =
+        Tween<double>(begin: 1.0, end: 0.0).animate(videoViewController);
+
     BetterPlayerConfiguration betterPlayerConfiguration =
         const BetterPlayerConfiguration(
       aspectRatio: 1.0,
@@ -79,9 +130,9 @@ class _UsingVideoControllerExampleState
         ),
       ],
     );
-    _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
-    _betterPlayerController.setupDataSource(_betterPlayerDataSource);
-    _betterPlayerController.setBetterPlayerGlobalKey(betterPlayerKey);
+    betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
+    betterPlayerController.setupDataSource(_betterPlayerDataSource);
+    betterPlayerController.setBetterPlayerGlobalKey(betterPlayerKey);
     super.initState();
   }
 
@@ -389,562 +440,621 @@ class _UsingVideoControllerExampleState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        color: Colors.black,
-        child: Stack(
-          children: [
-            GestureDetector(
-              onPanUpdate: (details) {
-                if (details.delta.dx > 0) widget.videoStatus(false);
+    return LayoutBuilder(builder: (context, constraints) {
+      maxVideoWidth = constraints.biggest.width;
 
-                if (details.delta.dy > 0) {
-                  // _betterPlayerController
-                  //     .enablePictureInPicture(betterPlayerKey);
-                }
-              },
-              child: AspectRatio(
-                aspectRatio: 1.4,
-                child: BetterPlayer(
-                  controller: _betterPlayerController,
-                  key: betterPlayerKey,
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                height: MediaQuery.of(context).size.height - 283,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                  color: Colors.white,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    likeStatus = likeStatus != 2 ? 2 : 1;
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.thumb_up_alt_rounded,
-                                  size: 25,
-                                  color: likeStatus == 2
-                                      ? colorLocalPink
-                                      : colorLocalGrey,
-                                )),
-                            Padding(
-                              padding: EdgeInsets.only(left: 5, right: 7),
-                              child: Text(
-                                '400k',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    likeStatus = likeStatus != 3 ? 3 : 1;
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.thumb_down_alt_rounded,
-                                  size: 25,
-                                  color: likeStatus == 3
-                                      ? colorLocalPink
-                                      : colorLocalGrey,
-                                )),
-                            Padding(
-                              padding: EdgeInsets.only(left: 5, right: 7),
-                              child: Text(
-                                '40',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    isCommented = !isCommented;
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.comment,
-                                  size: 25,
-                                  color: isCommented == true
-                                      ? colorLocalPink
-                                      : colorLocalGrey,
-                                )),
-                            Padding(
-                              padding: EdgeInsets.only(left: 5, right: 7),
-                              child: Text(
-                                '40k',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Container(
-                              height: 20,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      blurRadius: 2,
-                                      offset: Offset(0.0, 2)),
-                                ],
-                              ),
-                              child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    '40k Views',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.black,
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )),
-                            ),
-                            SizedBox(
-                              width: Platform.isIOS ? 40 : 20,
-                            ),
-                            InkWell(
-                                onTap: () {},
-                                child: Icon(
-                                  Icons.share,
-                                  size: 25,
-                                  color: colorLocalGrey,
-                                ))
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 10),
-                          child: Container(
-                            height: 1,
-                            color: colorLocalVeryLightGrey,
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(top: 10),
-                          height: MediaQuery.of(context).size.height * 0.08,
-                          width: MediaQuery.of(context).size.width,
-                          child: GridView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: myCategoryArray.length,
-                            gridDelegate:
-                                SliverGridDelegateWithMaxCrossAxisExtent(
-                                    maxCrossAxisExtent: 250,
-                                    childAspectRatio: 3 / 5,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 0),
-                            itemBuilder: (context, index) {
-                              return GridTile(
-                                  child: Container(
-                                alignment: Alignment.center,
-                                child: Card(
-                                  color: Color.fromRGBO(251, 251, 251, 1),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      InkWell(
-                                        onTap: () {},
-                                        child: Container(
-                                          height: 35,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10)),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.5),
-                                                  blurRadius: 2,
-                                                  offset: Offset(0.0, 2)),
-                                            ],
-                                          ),
-                                          child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                myCategoryArray[index].first,
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.black,
-                                                  fontFamily: 'Quicksand',
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              )),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ));
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Lofi hip hop mix - Beats",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              InkWell(
-                                  onTap: () {},
-                                  child: Icon(
-                                    Icons.bookmark,
-                                    size: 25,
-                                    color: colorLocalGrey,
-                                  )),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Image.asset(
-                                'assets/images/ic_location.png',
-                                height: 20,
-                                width: 20,
-                              ),
-                              Text(
-                                " San Francisco",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Quicksand',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 10,
-                            bottom: 10,
-                          ),
-                          child: Container(
-                            height: 60,
-                            width: MediaQuery.of(context).size.width - 40,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 3,
-                                    spreadRadius: 3,
-                                    offset: Offset(3, 2)),
-                              ],
-                            ),
-                            alignment: Alignment.center,
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
-                                        child: Container(
-                                          child: InkWell(
-                                            child: CircleAvatar(
-                                              radius: 20,
-                                              backgroundImage: AssetImage(
-                                                  'assets/images/ic_demoprofile.png'),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 12, bottom: 5),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              child: Center(
-                                                child: Text(
-                                                  " Divya Sharma",
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontFamily: 'Quicksand',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 16),
-                                                ),
-                                              ),
-                                            ),
-                                            Text(
-                                              '10k Subscribers',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: colorLocalGrey,
-                                                fontFamily: 'Quicksand',
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 20),
-                                    child: Text(
-                                      'Follow',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.pink,
-                                          fontFamily: 'Quicksand',
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ]),
-                          ),
-                        ),
-                        ExpandablePanel(
-                          header: Container(
-                            margin: EdgeInsets.only(top: 13),
-                            child: Text(
-                              'Description',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          collapsed: Text(
-                            "There are many variations of passages of Lorem Ipsum available",
-                            softWrap: true,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          expanded: Text(
-                            'There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.',
-                            softWrap: true,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            top: 20.0,
-                          ),
-                          child: Container(
-                            height: 50.0,
-                            width: MediaQuery.of(context).size.width * 0.90,
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 9.0,
-                                    spreadRadius: 1.0,
-                                  ),
-                                ]),
-                            child: TextFormField(
-                              textCapitalization: TextCapitalization.words,
-                              autofocus: false,
-                              textAlign: TextAlign.left,
-                              decoration: InputDecoration(
-                                hintText: 'Leave a Comment',
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                disabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    borderSide:
-                                        BorderSide(color: colorLocalPink)),
-                                fillColor: Colors.white,
-                                filled: true,
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: ExpandablePanel(
-                              controller: commentController,
-                              header: Container(
-                                width: MediaQuery.of(context).size.width,
-                                margin: const EdgeInsets.only(
-                                  right: 170.0,
-                                ),
-                                child: ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                                colorLocalGrey),
-                                        shape: MaterialStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                        ))),
-                                    child: Text(
-                                      'Comments',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                          fontFamily: 'Quicksand',
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    onPressed: () {
-                                      commentController.toggle();
-                                    }),
-                              ),
-                              collapsed: setCommentSection(),
-                              expanded: ListView.builder(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  itemCount: 4,
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    return setCommentSection();
-                                  })),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Text(
-                            "Recommended",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontFamily: 'Quicksand',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 5, bottom: 10),
-                          child: Container(
-                            height: 170,
-                            child: GridView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 9,
-                              gridDelegate:
-                                  SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 250,
-                                      childAspectRatio: 3 / 2.4,
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 0),
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  child: GridTile(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Card(
-                                      color: Color.fromRGBO(251, 251, 251, 1),
-                                      elevation: 1.0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          _backImageVideo(),
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                                left: 4.0, right: 4.0),
-                                            child: _cardBottom(false),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )),
-                                  onTap: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //       builder: (context) => VideoDetails()),
-                                    // );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
+      if (!isInSmallMode) {
+        currentVideoWidth = maxVideoWidth;
+      }
+      return Scaffold(
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.black,
+          child: Stack(
+            children: [
+              Align(
+                alignment: currentAlignment,
+                child: GestureDetector(
+                  onVerticalDragEnd: (details) {
+                    if (details.velocity.pixelsPerSecond.dy > 0) {
+                      setState(() {
+                        isInSmallMode = true;
+                        alignmentAnimationController.forward();
+                        videoViewController.forward();
+                      });
+                    } else if (details.velocity.pixelsPerSecond.dy < 0) {
+                      setState(() {
+                        alignmentAnimationController.reverse();
+                        videoViewController.reverse().then((value) {
+                          setState(() {
+                            isInSmallMode = false;
+                          });
+                        });
+                      });
+                    }
+                  },
+                  child: AspectRatio(
+                    aspectRatio: 1.4,
+                    child: BetterPlayer(
+                      controller: betterPlayerController,
+                      key: betterPlayerKey,
                     ),
                   ),
                 ),
               ),
-            )
-          ],
+              currentAlignment == Alignment.topCenter
+                  ? Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        height: MediaQuery.of(context).size.height - 283,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
+                          ),
+                          color: Colors.white,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            likeStatus =
+                                                likeStatus != 2 ? 2 : 1;
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.thumb_up_alt_rounded,
+                                          size: 25,
+                                          color: likeStatus == 2
+                                              ? colorLocalPink
+                                              : colorLocalGrey,
+                                        )),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 5, right: 7),
+                                      child: Text(
+                                        '400k',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            likeStatus =
+                                                likeStatus != 3 ? 3 : 1;
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.thumb_down_alt_rounded,
+                                          size: 25,
+                                          color: likeStatus == 3
+                                              ? colorLocalPink
+                                              : colorLocalGrey,
+                                        )),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 5, right: 7),
+                                      child: Text(
+                                        '40',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            isCommented = !isCommented;
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.comment,
+                                          size: 25,
+                                          color: isCommented == true
+                                              ? colorLocalPink
+                                              : colorLocalGrey,
+                                        )),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 5, right: 7),
+                                      child: Text(
+                                        '40k',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Container(
+                                      height: 20,
+                                      width: 60,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              blurRadius: 2,
+                                              offset: Offset(0.0, 2)),
+                                        ],
+                                      ),
+                                      child: Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            '40k Views',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.black,
+                                              fontFamily: 'Quicksand',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          )),
+                                    ),
+                                    SizedBox(
+                                      width: Platform.isIOS ? 40 : 20,
+                                    ),
+                                    InkWell(
+                                        onTap: () {},
+                                        child: Icon(
+                                          Icons.share,
+                                          size: 25,
+                                          color: colorLocalGrey,
+                                        ))
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 10, bottom: 10),
+                                  child: Container(
+                                    height: 1,
+                                    color: colorLocalVeryLightGrey,
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(top: 10),
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.08,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: GridView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: myCategoryArray.length,
+                                    gridDelegate:
+                                        SliverGridDelegateWithMaxCrossAxisExtent(
+                                            maxCrossAxisExtent: 250,
+                                            childAspectRatio: 3 / 5,
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 0),
+                                    itemBuilder: (context, index) {
+                                      return GridTile(
+                                          child: Container(
+                                        alignment: Alignment.center,
+                                        child: Card(
+                                          color:
+                                              Color.fromRGBO(251, 251, 251, 1),
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: <Widget>[
+                                              InkWell(
+                                                onTap: () {},
+                                                child: Container(
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                10)),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          color: Colors.grey
+                                                              .withOpacity(0.5),
+                                                          blurRadius: 2,
+                                                          offset:
+                                                              Offset(0.0, 2)),
+                                                    ],
+                                                  ),
+                                                  child: Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text(
+                                                        myCategoryArray[index]
+                                                            .first,
+                                                        style: TextStyle(
+                                                          fontSize: 10,
+                                                          color: Colors.black,
+                                                          fontFamily:
+                                                              'Quicksand',
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      )),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ));
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 5, bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Lofi hip hop mix - Beats",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      InkWell(
+                                          onTap: () {},
+                                          child: Icon(
+                                            Icons.bookmark,
+                                            size: 25,
+                                            color: colorLocalGrey,
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 5, bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/ic_location.png',
+                                        height: 20,
+                                        width: 20,
+                                      ),
+                                      Text(
+                                        " San Francisco",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Quicksand',
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 10,
+                                    bottom: 10,
+                                  ),
+                                  child: Container(
+                                    height: 60,
+                                    width:
+                                        MediaQuery.of(context).size.width - 40,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            blurRadius: 3,
+                                            spreadRadius: 3,
+                                            offset: Offset(3, 2)),
+                                      ],
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10),
+                                                child: Container(
+                                                  child: InkWell(
+                                                    child: CircleAvatar(
+                                                      radius: 20,
+                                                      backgroundImage: AssetImage(
+                                                          'assets/images/ic_demoprofile.png'),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 12, bottom: 5),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      child: Center(
+                                                        child: Text(
+                                                          " Divya Sharma",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontFamily:
+                                                                  'Quicksand',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 16),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '10k Subscribers',
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        color: colorLocalGrey,
+                                                        fontFamily: 'Quicksand',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 20),
+                                            child: Text(
+                                              'Follow',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.pink,
+                                                  fontFamily: 'Quicksand',
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ]),
+                                  ),
+                                ),
+                                ExpandablePanel(
+                                  header: Container(
+                                    margin: EdgeInsets.only(top: 13),
+                                    child: Text(
+                                      'Description',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  collapsed: Text(
+                                    "There are many variations of passages of Lorem Ipsum available",
+                                    softWrap: true,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  expanded: Text(
+                                    'There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.',
+                                    softWrap: true,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    top: 20.0,
+                                  ),
+                                  child: Container(
+                                    height: 50.0,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.90,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            blurRadius: 9.0,
+                                            spreadRadius: 1.0,
+                                          ),
+                                        ]),
+                                    child: TextFormField(
+                                      textCapitalization:
+                                          TextCapitalization.words,
+                                      autofocus: false,
+                                      textAlign: TextAlign.left,
+                                      decoration: InputDecoration(
+                                        hintText: 'Leave a Comment',
+                                        enabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            borderSide: BorderSide(
+                                                color: Colors.white)),
+                                        disabledBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            borderSide: BorderSide(
+                                                color: Colors.white)),
+                                        focusedBorder: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            borderSide: BorderSide(
+                                                color: colorLocalPink)),
+                                        fillColor: Colors.white,
+                                        filled: true,
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: ExpandablePanel(
+                                      controller: commentController,
+                                      header: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        margin: const EdgeInsets.only(
+                                          right: 170.0,
+                                        ),
+                                        child: ElevatedButton(
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStateProperty.all(
+                                                        colorLocalGrey),
+                                                shape: MaterialStateProperty.all<
+                                                        RoundedRectangleBorder>(
+                                                    RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                ))),
+                                            child: Text(
+                                              'Comments',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                  fontFamily: 'Quicksand',
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            onPressed: () {
+                                              commentController.toggle();
+                                            }),
+                                      ),
+                                      collapsed: setCommentSection(),
+                                      expanded: ListView.builder(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          itemCount: 4,
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemBuilder: (context, index) {
+                                            return setCommentSection();
+                                          })),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  child: Text(
+                                    "Recommended",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Quicksand',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 5, bottom: 10),
+                                  child: Container(
+                                    height: 170,
+                                    child: GridView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: 9,
+                                      gridDelegate:
+                                          SliverGridDelegateWithMaxCrossAxisExtent(
+                                              maxCrossAxisExtent: 250,
+                                              childAspectRatio: 3 / 2.4,
+                                              crossAxisSpacing: 10,
+                                              mainAxisSpacing: 0),
+                                      itemBuilder: (context, index) {
+                                        return InkWell(
+                                          child: GridTile(
+                                              child: Container(
+                                            alignment: Alignment.center,
+                                            child: Card(
+                                              color: Color.fromRGBO(
+                                                  251, 251, 251, 1),
+                                              elevation: 1.0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: <Widget>[
+                                                  _backImageVideo(),
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        left: 4.0, right: 4.0),
+                                                    child: _cardBottom(false),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )),
+                                          onTap: () {
+                                            // Navigator.push(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //       builder: (context) => VideoDetails()),
+                                            // );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Container()
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
