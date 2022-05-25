@@ -728,7 +728,9 @@ class _VideoDetailsState extends State<VideoDetails> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => UsingVideoControllerExample()),
+                    builder: (context) => UsingVideoControllerExample(
+                          videoStatus: () {},
+                        )),
               );
             },
             child: Container(

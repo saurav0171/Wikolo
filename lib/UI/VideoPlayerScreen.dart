@@ -8,7 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:wikolo/CommonFiles/common.dart';
 
 class UsingVideoControllerExample extends StatefulWidget {
-  UsingVideoControllerExample({Key? key}) : super(key: key);
+  Function videoStatus;
+  UsingVideoControllerExample({Key? key, required this.videoStatus})
+      : super(key: key);
 
   @override
   _UsingVideoControllerExampleState createState() =>
@@ -22,6 +24,7 @@ class _UsingVideoControllerExampleState
   var likeStatus = 1; //1 for nothing, 2 for like, 3 for Unlike
   bool isCommented = false;
   ExpandableController commentController = ExpandableController();
+  GlobalKey betterPlayerKey = GlobalKey();
   final myCategoryArray = [
     ["All"],
     ["Books"],
@@ -42,6 +45,7 @@ class _UsingVideoControllerExampleState
       fit: BoxFit.fill,
       autoPlay: true,
       looping: true,
+      autoDispose: false,
       deviceOrientationsAfterFullScreen: [
         DeviceOrientation.portraitDown,
         DeviceOrientation.portraitUp
@@ -51,6 +55,7 @@ class _UsingVideoControllerExampleState
     //   BetterPlayerDataSourceType.network,
     //   "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
     // );
+
     _betterPlayerDataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
       "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
@@ -76,6 +81,7 @@ class _UsingVideoControllerExampleState
     );
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     _betterPlayerController.setupDataSource(_betterPlayerDataSource);
+    _betterPlayerController.setBetterPlayerGlobalKey(betterPlayerKey);
     super.initState();
   }
 
@@ -390,9 +396,22 @@ class _UsingVideoControllerExampleState
         color: Colors.black,
         child: Stack(
           children: [
-            AspectRatio(
-              aspectRatio: 1.4,
-              child: BetterPlayer(controller: _betterPlayerController),
+            GestureDetector(
+              onPanUpdate: (details) {
+                if (details.delta.dx > 0) widget.videoStatus(false);
+
+                if (details.delta.dy > 0) {
+                  // _betterPlayerController
+                  //     .enablePictureInPicture(betterPlayerKey);
+                }
+              },
+              child: AspectRatio(
+                aspectRatio: 1.4,
+                child: BetterPlayer(
+                  controller: _betterPlayerController,
+                  key: betterPlayerKey,
+                ),
+              ),
             ),
             Align(
               alignment: Alignment.bottomCenter,

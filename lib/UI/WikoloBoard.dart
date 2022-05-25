@@ -8,7 +8,9 @@ import 'package:wikolo/UI/Golive.dart';
 import 'package:wikolo/UI/ImageDetails.dart';
 import 'package:wikolo/UI/ImagePostDetails.dart';
 import 'package:wikolo/UI/ImagesProfileDetails.dart';
+import 'package:wikolo/UI/JoinMeeting.dart';
 import 'package:wikolo/UI/LiveStreamingDetails.dart';
+import 'package:wikolo/UI/Sample.dart';
 import 'package:wikolo/UI/SocialCategory.dart';
 import 'package:wikolo/UI/Uploadpost.dart';
 import 'package:wikolo/UI/VideoDetails.dart';
@@ -28,6 +30,7 @@ class _SocialBoardState extends State<SocialBoard> {
   bool isRecentSort = true;
   bool isVideoSelected = true;
   bool isFree = false;
+  bool isVideoViewShown = false;
   var selectedCategory = 'All';
 
   int radioButtonIndex =
@@ -73,6 +76,12 @@ class _SocialBoardState extends State<SocialBoard> {
   setCategory(String category) {
     setState(() {
       selectedCategory = category;
+    });
+  }
+
+  setVideoStatus(status) {
+    setState(() {
+      isVideoViewShown = status;
     });
   }
 
@@ -796,406 +805,724 @@ class _SocialBoardState extends State<SocialBoard> {
     double tileWidth = Platform.isIOS ? 70 : 65;
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.white,
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddGurudwara()),
-              );
-            },
-            backgroundColor: colorLocalPink.withOpacity(0.5),
-            child: Icon(Icons.add)),
-        body: NestedScrollView(
-          headerSliverBuilder:
-              (BuildContext buildcontext, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverAppBar(
-                backgroundColor: Colors.white,
-                expandedHeight: 300.0,
-                floating: false,
-                pinned: true,
-                flexibleSpace: LayoutBuilder(builder:
-                    (BuildContext flexcontext, BoxConstraints constraints) {
-                  // print('constraints=' + constraints.toString());
-                  WidgetsBinding.instance?.addPostFrameCallback((_) {
-                    // Add Your Code here.
-                    setState(() {
-                      top = constraints.biggest.height;
-                    });
-                  });
+          backgroundColor: Colors.white,
+          floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Meeting()),
+                );
+              },
+              backgroundColor: colorLocalPink.withOpacity(0.5),
+              child: Icon(Icons.add)),
+          body: Stack(
+            children: [
+              NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext buildcontext, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverAppBar(
+                      backgroundColor: Colors.white,
+                      expandedHeight: 300.0,
+                      floating: false,
+                      pinned: true,
+                      flexibleSpace: LayoutBuilder(builder:
+                          (BuildContext flexcontext,
+                              BoxConstraints constraints) {
+                        // print('constraints=' + constraints.toString());
+                        WidgetsBinding.instance?.addPostFrameCallback((_) {
+                          // Add Your Code here.
+                          setState(() {
+                            top = constraints.biggest.height;
+                          });
+                        });
 
-                  print('Top is : $top');
-                  return FlexibleSpaceBar(
-                    centerTitle: true,
-                    background: Container(
-                      padding: EdgeInsets.only(top: 50.0),
-                      height: 330,
-                      width: MediaQuery.of(context).size.width,
-                      color: Color.fromRGBO(223, 233, 208, 1),
-                      child: Column(
-                        children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        // print('Top is : $top');
+                        return FlexibleSpaceBar(
+                          centerTitle: true,
+                          background: Container(
+                            padding: EdgeInsets.only(top: 50.0),
+                            height: 330,
+                            width: MediaQuery.of(context).size.width,
+                            color: Color.fromRGBO(223, 233, 208, 1),
+                            child: Column(
                               children: [
-                                Container(
-                                  padding: EdgeInsets.only(top: 5.0, left: 15),
-                                  child: InkWell(
-                                    onTap: () {
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //       builder: (context) => Profile()),
-                                      // );
-                                    },
-                                    child: CircleAvatar(
-                                      radius: 20,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/ic_demoprofile.png'),
-                                      backgroundColor: Colors.yellow,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(left: 15),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.65,
-                                  height: 60,
-                                  child: Column(
+                                Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 5.0, bottom: 5.0),
-                                        child: FittedBox(
-                                          fit: BoxFit.fitWidth,
-                                          child: Text(
-                                            "Divya Sharma",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Quicksand',
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(top: 0.0),
-                                        child: Container(
-                                          child: Row(
-                                            children: [
-                                              Image.asset(
-                                                'assets/images/ic_location.png',
-                                                height: 15,
-                                                width: 15,
-                                              ),
-                                              Text(
-                                                " San Francisco",
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontFamily: 'Quicksand',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 13),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                    // 1,2,3,4
-                                  ),
-                                ),
-                                Container(
-                                  height: 30,
-                                  width: 30,
-                                  child: IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(Icons.map_outlined)),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 7, top: 7),
-                                  child: Container(
-                                    padding: EdgeInsets.only(right: 5.0),
-                                    height: 25,
-                                    width: 25,
-                                    child: Image.asset(
-                                      'assets/images/ic_notify.png',
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ]),
-                          Container(
-                              padding: EdgeInsets.only(left: 15.0, top: 5),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Looking for Something ?",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 26),
-                                ),
-                              )),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.0, left: 15.0),
-                                child: Container(
-                                  padding: EdgeInsets.only(top: 0.0),
-                                  height: 50.0,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.75,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        bottomLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10),
-                                        bottomRight: Radius.circular(10),
-                                      ),
-                                      color: Colors.white,
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color:
-                                              Color.fromRGBO(240, 240, 240, 1),
-                                          blurRadius: 9.0,
-                                          spreadRadius: 1.0,
-                                        ),
-                                      ]),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      "    Search Anything",
-                                      style: TextStyle(
-                                        color: Color.fromRGBO(145, 145, 145, 1),
-                                        fontFamily: 'Quicksand',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.0, left: 15.0),
-                                child: Container(
-                                  padding: EdgeInsets.only(top: 0.0),
-                                  height: 50.0,
-                                  width: 50.0,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(11),
-                                      bottomLeft: Radius.circular(11),
-                                      topRight: Radius.circular(11),
-                                      bottomRight: Radius.circular(11),
-                                    ),
-                                    color: Colors.white,
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Color.fromRGBO(240, 240, 240, 1),
-                                        blurRadius: 9.0,
-                                        spreadRadius: 1.0,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        InkWell(
+                                      Container(
+                                        padding:
+                                            EdgeInsets.only(top: 5.0, left: 15),
+                                        child: InkWell(
                                           onTap: () {
-                                            showPopUp(context);
+                                            // Navigator.push(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //       builder: (context) => Profile()),
+                                            // );
                                           },
-                                          child: Image.asset(
-                                            'assets/images/ic_net.png',
-                                            height: 20,
-                                            width: 20,
+                                          child: CircleAvatar(
+                                            radius: 20,
+                                            backgroundImage: AssetImage(
+                                                'assets/images/ic_demoprofile.png'),
+                                            backgroundColor: Colors.yellow,
                                           ),
                                         ),
-                                      ]),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(top: 15.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 5.0, left: 15.0),
-                                  child: Container(
-                                    padding: EdgeInsets.only(top: 0.0),
-                                    width: MediaQuery.of(context).size.width *
-                                        0.28,
-                                    height: 85,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(11),
-                                        bottomLeft: Radius.circular(11),
-                                        topRight: Radius.circular(11),
-                                        bottomRight: Radius.circular(11),
                                       ),
-                                      color: Colors.white,
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 9.0,
-                                          spreadRadius: 1.0,
-                                          offset: Offset(0, 7),
-                                        ),
-                                      ],
-                                    ),
-                                    child: AspectRatio(
-                                      aspectRatio: 1,
-                                      child: Container(
-                                        height: double.infinity,
+                                      Container(
+                                        padding: EdgeInsets.only(left: 15),
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.65,
+                                        height: 60,
                                         child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+
                                           children: [
-                                            Align(
-                                              alignment: Alignment.center,
-                                              child: Image.asset(
-                                                'assets/images/social.png',
-                                                height: 60,
-                                                width: 60,
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 5.0, bottom: 5.0),
+                                              child: FittedBox(
+                                                fit: BoxFit.fitWidth,
+                                                child: Text(
+                                                  "Divya Sharma",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontFamily: 'Quicksand',
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 18),
+                                                ),
                                               ),
                                             ),
-                                            Text(
-                                              "Wikolo Board",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Quicksand',
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 13,
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 0.0),
+                                              child: Container(
+                                                child: Row(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/ic_location.png',
+                                                      height: 15,
+                                                      width: 15,
+                                                    ),
+                                                    Text(
+                                                      " San Francisco",
+                                                      style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontFamily:
+                                                              'Quicksand',
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 13),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ],
+                                          // 1,2,3,4
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 5.0),
-                                  child: InkWell(
-                                    onTap: () {
-                                      print("fff");
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //       builder: (context) => LandPage()),
-                                      // );
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.only(top: 0.0),
-                                      width: MediaQuery.of(context).size.width *
-                                          0.28,
-                                      height: 85,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(11),
-                                          bottomLeft: Radius.circular(11),
-                                          topRight: Radius.circular(11),
-                                          bottomRight: Radius.circular(11),
-                                        ),
-                                        color: Colors.white,
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.grey,
-                                            blurRadius: 9.0,
-                                            spreadRadius: 1.0,
-                                            offset: Offset(0, 7),
-                                          ),
-                                        ],
+                                      Container(
+                                        height: 30,
+                                        width: 30,
+                                        child: IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(Icons.map_outlined)),
                                       ),
-                                      child: AspectRatio(
-                                        aspectRatio: 1,
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 7, top: 7),
                                         child: Container(
-                                          height: double.infinity,
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: Column(
-                                              children: [
-                                                Image.asset(
-                                                  'assets/images/roomie1.png',
-                                                  height: 60,
-                                                  width: 60,
-                                                ),
-                                                Text(
-                                                  "Roomie",
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontFamily: 'Quicksand',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 13,
-                                                  ),
-                                                ),
-                                              ],
+                                          padding: EdgeInsets.only(right: 5.0),
+                                          height: 25,
+                                          width: 25,
+                                          child: Image.asset(
+                                            'assets/images/ic_notify.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ]),
+                                Container(
+                                    padding:
+                                        EdgeInsets.only(left: 15.0, top: 5),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        "Looking for Something ?",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Quicksand',
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 26),
+                                      ),
+                                    )),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 10.0, left: 15.0),
+                                      child: Container(
+                                        padding: EdgeInsets.only(top: 0.0),
+                                        height: 50.0,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.75,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              bottomLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                              bottomRight: Radius.circular(10),
+                                            ),
+                                            color: Colors.white,
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Color.fromRGBO(
+                                                    240, 240, 240, 1),
+                                                blurRadius: 9.0,
+                                                spreadRadius: 1.0,
+                                              ),
+                                            ]),
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            "    Search Anything",
+                                            style: TextStyle(
+                                              color: Color.fromRGBO(
+                                                  145, 145, 145, 1),
+                                              fontFamily: 'Quicksand',
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 10.0, left: 15.0),
+                                      child: Container(
+                                        padding: EdgeInsets.only(top: 0.0),
+                                        height: 50.0,
+                                        width: 50.0,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(11),
+                                            bottomLeft: Radius.circular(11),
+                                            topRight: Radius.circular(11),
+                                            bottomRight: Radius.circular(11),
+                                          ),
+                                          color: Colors.white,
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color.fromRGBO(
+                                                  240, 240, 240, 1),
+                                              blurRadius: 9.0,
+                                              spreadRadius: 1.0,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              InkWell(
+                                                onTap: () {
+                                                  showPopUp(context);
+                                                },
+                                                child: Image.asset(
+                                                  'assets/images/ic_net.png',
+                                                  height: 20,
+                                                  width: 20,
+                                                ),
+                                              ),
+                                            ]),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(top: 15.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 5.0, left: 15.0),
+                                        child: Container(
+                                          padding: EdgeInsets.only(top: 0.0),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.28,
+                                          height: 85,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(11),
+                                              bottomLeft: Radius.circular(11),
+                                              topRight: Radius.circular(11),
+                                              bottomRight: Radius.circular(11),
+                                            ),
+                                            color: Colors.white,
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.grey,
+                                                blurRadius: 9.0,
+                                                spreadRadius: 1.0,
+                                                offset: Offset(0, 7),
+                                              ),
+                                            ],
+                                          ),
+                                          child: AspectRatio(
+                                            aspectRatio: 1,
+                                            child: Container(
+                                              height: double.infinity,
+                                              child: Column(
+                                                children: [
+                                                  Align(
+                                                    alignment: Alignment.center,
+                                                    child: Image.asset(
+                                                      'assets/images/social.png',
+                                                      height: 60,
+                                                      width: 60,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "Wikolo Board",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontFamily: 'Quicksand',
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 5.0),
+                                        child: InkWell(
+                                          onTap: () {
+                                            print("fff");
+                                            // Navigator.push(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //       builder: (context) => LandPage()),
+                                            // );
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.only(top: 0.0),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.28,
+                                            height: 85,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(11),
+                                                bottomLeft: Radius.circular(11),
+                                                topRight: Radius.circular(11),
+                                                bottomRight:
+                                                    Radius.circular(11),
+                                              ),
+                                              color: Colors.white,
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Colors.grey,
+                                                  blurRadius: 9.0,
+                                                  spreadRadius: 1.0,
+                                                  offset: Offset(0, 7),
+                                                ),
+                                              ],
+                                            ),
+                                            child: AspectRatio(
+                                              aspectRatio: 1,
+                                              child: Container(
+                                                height: double.infinity,
+                                                child: Align(
+                                                  alignment: Alignment.center,
+                                                  child: Column(
+                                                    children: [
+                                                      Image.asset(
+                                                        'assets/images/roomie1.png',
+                                                        height: 60,
+                                                        width: 60,
+                                                      ),
+                                                      Text(
+                                                        "Roomie",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontFamily:
+                                                              'Quicksand',
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 13,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 5.0, right: 15.0),
+                                        child: Container(
+                                          padding: EdgeInsets.only(top: 0.0),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.28,
+                                          height: 85,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(11),
+                                              bottomLeft: Radius.circular(11),
+                                              topRight: Radius.circular(11),
+                                              bottomRight: Radius.circular(11),
+                                            ),
+                                            color: Colors.white,
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.grey,
+                                                blurRadius: 9.0,
+                                                spreadRadius: 1.0,
+                                                offset: Offset(0, 7),
+                                              ),
+                                            ],
+                                          ),
+                                          child: AspectRatio(
+                                            aspectRatio: 1,
+                                            child: Container(
+                                              height: double.infinity,
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: Column(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/market1.png',
+                                                      height: 60,
+                                                      width: 60,
+                                                    ),
+                                                    Text(
+                                                      "Market Place",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontFamily: 'Quicksand',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 5.0, right: 15.0),
-                                  child: Container(
-                                    padding: EdgeInsets.only(top: 0.0),
-                                    width: MediaQuery.of(context).size.width *
-                                        0.28,
-                                    height: 85,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(11),
-                                        bottomLeft: Radius.circular(11),
-                                        topRight: Radius.circular(11),
-                                        bottomRight: Radius.circular(11),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                      bottom: PreferredSize(
+                        preferredSize: const Size.fromHeight(20),
+                        child: AnimatedOpacity(
+                          duration: Duration(milliseconds: 200),
+                          opacity: top < 150 ? 1 : 0,
+                          child: Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 5),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 5.0),
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 0.0),
+                                      width: tileWidth,
+                                      height: 60,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 40,
+                                            width: 40,
+                                            padding: EdgeInsets.only(
+                                                top: 5, right: 5),
+                                            child: InkWell(
+                                              onTap: () {
+                                                // Navigator.push(
+                                                //   context,
+                                                //   MaterialPageRoute(
+                                                //       builder: (context) => Profile()),
+                                                // );
+                                              },
+                                              child: CircleAvatar(
+                                                radius: 20,
+                                                backgroundImage: AssetImage(
+                                                    'assets/images/ic_demoprofile.png'),
+                                                backgroundColor: Colors.yellow,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "Profile",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Quicksand',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      color: Colors.white,
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.grey,
-                                          blurRadius: 9.0,
-                                          spreadRadius: 1.0,
-                                          offset: Offset(0, 7),
-                                        ),
-                                      ],
                                     ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 5.0),
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 0.0),
+                                      width: tileWidth,
+                                      height: 60,
+                                      child: Column(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/social.png',
+                                            height: 45,
+                                            width: 45,
+                                          ),
+                                          Text(
+                                            "Social Board",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontFamily: 'Quicksand',
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 5.0),
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 0.0),
+                                      width: tileWidth,
+                                      height: 60,
+                                      child: Column(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/roomie1.png',
+                                            height: 45,
+                                            width: 45,
+                                          ),
+                                          Text(
+                                            "Roomie",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontFamily: 'Quicksand',
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 5.0),
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 0.0),
+                                      width: tileWidth,
+                                      height: 60,
+                                      child: Column(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/market1.png',
+                                            height: 45,
+                                            width: 45,
+                                          ),
+                                          Text(
+                                            "Market Place",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontFamily: 'Quicksand',
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 0.0),
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 0.0),
+                                      width: tileWidth,
+                                      height: 60,
+                                      child: Column(
+                                        children: const [
+                                          Icon(
+                                            Icons.search,
+                                            size: 45,
+                                          ),
+                                          Text(
+                                            "Search",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontFamily: 'Quicksand',
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ];
+                },
+                body: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Scrollbar(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding:
+                                EdgeInsets.only(left: 20, top: 10, right: 20),
+                            width: MediaQuery.of(context).size.width,
+                            child: Stack(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    height: 35,
+                                    width: 90,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(246, 55, 60, 1),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(7)),
+                                    ),
+                                    child: InkWell(
+                                      onTap: () {
+                                        // Navigator.of(context).push(
+                                        //     PageRouteBuilder(
+                                        //         opaque: false,
+                                        //         pageBuilder:
+                                        //             (BuildContext context, _,
+                                        //                     __) =>
+                                        //                 GoLive(
+                                        //                   isGoLive: true,
+                                        //                 )));
+
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  MyHomePage()),
+                                        );
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/ic_live.png',
+                                            height: 25,
+                                            width: 25,
+                                          ),
+                                          Text(
+                                            'Go Live',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: 'Quicksand',
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Container(
+                                    padding: EdgeInsets.only(left: 5),
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.1,
                                     child: AspectRatio(
                                       aspectRatio: 1,
                                       child: Container(
                                         height: double.infinity,
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Column(
-                                            children: [
-                                              Image.asset(
-                                                'assets/images/market1.png',
-                                                height: 60,
-                                                width: 60,
-                                              ),
-                                              Text(
-                                                "Market Place",
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontFamily: 'Quicksand',
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ],
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                            bottomRight: Radius.circular(10),
+                                          ),
+                                          color:
+                                              Color.fromRGBO(242, 242, 242, 1),
+                                        ),
+                                        child: InkWell(
+                                          onTap: () {
+                                            WidgetsBinding.instance!
+                                                .addPostFrameCallback((_) {
+                                              // Add Your Code here.
+                                              showPopUpFilter(context);
+                                            });
+                                            SchedulerBinding.instance!
+                                                .addPostFrameCallback(
+                                                    (timeStamp) {});
+                                          },
+                                          child: Image.asset(
+                                            'assets/images/ic_filter.png',
+                                            height: 15,
+                                            width: 15,
                                           ),
                                         ),
                                       ),
@@ -1205,676 +1532,435 @@ class _SocialBoardState extends State<SocialBoard> {
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-                bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(20),
-                  child: AnimatedOpacity(
-                    duration: Duration(milliseconds: 200),
-                    opacity: top < 150 ? 1 : 0,
-                    child: Container(
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(right: 5.0),
-                              child: Container(
-                                padding: EdgeInsets.only(top: 0.0),
-                                width: tileWidth,
-                                height: 60,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      height: 40,
-                                      width: 40,
-                                      padding:
-                                          EdgeInsets.only(top: 5, right: 5),
-                                      child: InkWell(
-                                        onTap: () {
-                                          // Navigator.push(
-                                          //   context,
-                                          //   MaterialPageRoute(
-                                          //       builder: (context) => Profile()),
-                                          // );
-                                        },
-                                        child: CircleAvatar(
-                                          radius: 20,
-                                          backgroundImage: AssetImage(
-                                              'assets/images/ic_demoprofile.png'),
-                                          backgroundColor: Colors.yellow,
-                                        ),
+
+                          Container(
+                            padding:
+                                EdgeInsets.only(left: 20, top: 15, right: 20),
+                            width: MediaQuery.of(context).size.width,
+                            child: Stack(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    "Categories",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Quicksand',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // showCategory(context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SocialCategory(
+                                                  setCategory: setCategory,
+                                                )),
+                                      );
+                                    },
+                                    child: Text(
+                                      "See All",
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(145, 145, 145, 1),
+                                        fontFamily: 'Quicksand',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 11,
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5.0),
-                                      child: Text(
-                                        "Profile",
-                                        style: TextStyle(
-                                          color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Container(
+                            padding:
+                                EdgeInsets.only(top: 10, right: 16, left: 16),
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            width: MediaQuery.of(context).size.width,
+                            child: GridView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: myTextArray.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 250,
+                                      childAspectRatio: 0.75,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 0),
+                              itemBuilder: (context, index) {
+                                return GridTile(
+                                    child: Container(
+                                  alignment: Alignment.center,
+                                  child: Card(
+                                    color: Color.fromRGBO(251, 251, 251, 1),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedCategory =
+                                                  myTextArray[index].first;
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 35,
+                                            decoration: BoxDecoration(
+                                              color: selectedCategory ==
+                                                      myTextArray[index].first
+                                                  ? colorLocalPink
+                                                  : Colors.white,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.5),
+                                                    blurRadius: 2,
+                                                    offset: Offset(0.0, 2)),
+                                              ],
+                                            ),
+                                            child: Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  myTextArray[index].first,
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: selectedCategory ==
+                                                            myTextArray[index]
+                                                                .first
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                                    fontFamily: 'Quicksand',
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ));
+                              },
+                            ),
+                          ),
+
+                          //******* start divider with one space **********************
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            height: 27,
+                            width: MediaQuery.of(context).size.width,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(left: 10),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  child: Text(
+                                    "Live Streaming",
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.black,
+                                      fontFamily: 'Quicksand',
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              LiveStreamingDetails()),
+                                    );
+                                  },
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text(
+                                      "See All",
+                                      style: TextStyle(
+                                          color:
+                                              Color.fromRGBO(145, 145, 145, 1),
                                           fontFamily: 'Quicksand',
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+
+                          //******* Live Streaming **********
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            width: MediaQuery.of(context).size.width,
+                            height: 170,
+                            child: GridView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 9,
+                              gridDelegate:
+                                  SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 285,
+                                      childAspectRatio: 3 / 2.4,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 0),
+                              itemBuilder: (context, index) {
+                                return GridTile(
+                                    child: Container(
+                                  alignment: Alignment.center,
+                                  child: Card(
+                                    color: Color.fromRGBO(251, 251, 251, 1),
+                                    elevation: 1.0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        _backImage(),
+                                        Container(
+                                          padding: EdgeInsets.only(
+                                              left: 4.0, right: 4.0),
+                                          child: _cardBottom(false),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                ));
+                              },
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(right: 5.0),
-                              child: Container(
-                                padding: EdgeInsets.only(top: 0.0),
-                                width: tileWidth,
-                                height: 60,
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/social.png',
-                                      height: 45,
-                                      width: 45,
+                          ),
+
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            height: 27,
+                            width: MediaQuery.of(context).size.width,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(left: 10),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  child: Text(
+                                    "Videos",
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.black,
+                                      fontFamily: 'Quicksand',
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    Text(
-                                      "Social Board",
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => VideoDetails()),
+                                    );
+                                  },
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text(
+                                      "See All",
                                       style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: 'Quicksand',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 10,
+                                          color:
+                                              Color.fromRGBO(145, 145, 145, 1),
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+
+                          //***** video streaming ******
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            height: 170,
+                            child: GridView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 9,
+                              gridDelegate:
+                                  SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 250,
+                                      childAspectRatio: 3 / 2.4,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 0),
+                              itemBuilder: (context, index) {
+                                return InkWell(
+                                  child: GridTile(
+                                      child: Container(
+                                    alignment: Alignment.center,
+                                    child: Card(
+                                      color: Color.fromRGBO(251, 251, 251, 1),
+                                      elevation: 1.0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          _backImageVideo(),
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: 4.0, right: 4.0),
+                                            child: _cardBottom(false),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  )),
+                                  onTap: () {
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) =>
+                                    //           UsingVideoControllerExample()),
+                                    // );
+                                    setState(() {
+                                      isVideoViewShown = true;
+                                    });
+                                  },
+                                );
+                              },
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(right: 5.0),
-                              child: Container(
-                                padding: EdgeInsets.only(top: 0.0),
-                                width: tileWidth,
-                                height: 60,
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/roomie1.png',
-                                      height: 45,
-                                      width: 45,
+                          ),
+
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            height: 27,
+                            width: MediaQuery.of(context).size.width,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(left: 10),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  child: Text(
+                                    "Images",
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.black,
+                                      fontFamily: 'Quicksand',
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    Text(
-                                      "Roomie",
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ImageDetails()),
+                                    );
+                                  },
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text(
+                                      "See All",
                                       style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: 'Quicksand',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 10,
+                                          color:
+                                              Color.fromRGBO(145, 145, 145, 1),
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+
+                          //******* Images **********
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            height: 230,
+                            child: GridView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 9,
+                              gridDelegate:
+                                  SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 250,
+                                      childAspectRatio: 1.6,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 0),
+                              itemBuilder: (context, index) {
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ImagePostDetails()),
+                                    );
+                                  },
+                                  child: GridTile(
+                                      child: Container(
+                                    alignment: Alignment.center,
+                                    child: Card(
+                                      color: Color.fromRGBO(251, 251, 251, 1),
+                                      elevation: 1.0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          _backImageStream(),
+                                          Container(
+                                            padding: EdgeInsets.only(
+                                                left: 4.0, right: 4.0),
+                                            child: _cardBottom(true),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  )),
+                                );
+                              },
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(right: 5.0),
-                              child: Container(
-                                padding: EdgeInsets.only(top: 0.0),
-                                width: tileWidth,
-                                height: 60,
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/market1.png',
-                                      height: 45,
-                                      width: 45,
-                                    ),
-                                    Text(
-                                      "Market Place",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: 'Quicksand',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(right: 0.0),
-                              child: Container(
-                                padding: EdgeInsets.only(top: 0.0),
-                                width: tileWidth,
-                                height: 60,
-                                child: Column(
-                                  children: const [
-                                    Icon(
-                                      Icons.search,
-                                      size: 45,
-                                    ),
-                                    Text(
-                                      "Search",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: 'Quicksand',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              )
-            ];
-          },
-          body: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Scrollbar(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(left: 20, top: 10, right: 20),
-                      width: MediaQuery.of(context).size.width,
-                      child: Stack(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              height: 35,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(246, 55, 60, 1),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(7)),
-                              ),
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(PageRouteBuilder(
-                                      opaque: false,
-                                      pageBuilder:
-                                          (BuildContext context, _, __) =>
-                                              GoLive(
-                                                isGoLive: true,
-                                              )));
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/ic_live.png',
-                                      height: 25,
-                                      width: 25,
-                                    ),
-                                    Text(
-                                      'Go Live',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: 'Quicksand',
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                              padding: EdgeInsets.only(left: 5),
-                              width: MediaQuery.of(context).size.width * 0.1,
-                              child: AspectRatio(
-                                aspectRatio: 1,
-                                child: Container(
-                                  height: double.infinity,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(10),
-                                      bottomLeft: Radius.circular(10),
-                                      topRight: Radius.circular(10),
-                                      bottomRight: Radius.circular(10),
-                                    ),
-                                    color: Color.fromRGBO(242, 242, 242, 1),
-                                  ),
-                                  child: InkWell(
-                                    onTap: () {
-                                      WidgetsBinding.instance!
-                                          .addPostFrameCallback((_) {
-                                        // Add Your Code here.
-                                        showPopUpFilter(context);
-                                      });
-                                      SchedulerBinding.instance!
-                                          .addPostFrameCallback((timeStamp) {});
-                                    },
-                                    child: Image.asset(
-                                      'assets/images/ic_filter.png',
-                                      height: 15,
-                                      width: 15,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.only(left: 20, top: 15, right: 20),
-                      width: MediaQuery.of(context).size.width,
-                      child: Stack(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Categories",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Quicksand',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: GestureDetector(
-                              onTap: () {
-                                // showCategory(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SocialCategory(
-                                            setCategory: setCategory,
-                                          )),
-                                );
-                              },
-                              child: Text(
-                                "See All",
-                                style: TextStyle(
-                                  color: Color.fromRGBO(145, 145, 145, 1),
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.only(top: 10, right: 16, left: 16),
-                      height: MediaQuery.of(context).size.height * 0.08,
-                      width: MediaQuery.of(context).size.width,
-                      child: GridView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: myTextArray.length,
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 250,
-                            childAspectRatio: 0.75,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 0),
-                        itemBuilder: (context, index) {
-                          return GridTile(
-                              child: Container(
-                            alignment: Alignment.center,
-                            child: Card(
-                              color: Color.fromRGBO(251, 251, 251, 1),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedCategory =
-                                            myTextArray[index].first;
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 35,
-                                      decoration: BoxDecoration(
-                                        color: selectedCategory ==
-                                                myTextArray[index].first
-                                            ? colorLocalPink
-                                            : Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10)),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.5),
-                                              blurRadius: 2,
-                                              offset: Offset(0.0, 2)),
-                                        ],
-                                      ),
-                                      child: Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            myTextArray[index].first,
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              color: selectedCategory ==
-                                                      myTextArray[index].first
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                              fontFamily: 'Quicksand',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          )),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ));
-                        },
-                      ),
-                    ),
-
-                    //******* start divider with one space **********************
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      height: 27,
-                      width: MediaQuery.of(context).size.width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 10),
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Text(
-                              "Live Streaming",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.black,
-                                fontFamily: 'Quicksand',
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        LiveStreamingDetails()),
-                              );
-                            },
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                "See All",
-                                style: TextStyle(
-                                    color: Color.fromRGBO(145, 145, 145, 1),
-                                    fontFamily: 'Quicksand',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-
-                    //******* Live Streaming **********
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      width: MediaQuery.of(context).size.width,
-                      height: 170,
-                      child: GridView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 9,
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 285,
-                            childAspectRatio: 3 / 2.4,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 0),
-                        itemBuilder: (context, index) {
-                          return GridTile(
-                              child: Container(
-                            alignment: Alignment.center,
-                            child: Card(
-                              color: Color.fromRGBO(251, 251, 251, 1),
-                              elevation: 1.0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  _backImage(),
-                                  Container(
-                                    padding:
-                                        EdgeInsets.only(left: 4.0, right: 4.0),
-                                    child: _cardBottom(false),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ));
-                        },
-                      ),
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      height: 27,
-                      width: MediaQuery.of(context).size.width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 10),
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Text(
-                              "Videos",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.black,
-                                fontFamily: 'Quicksand',
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => VideoDetails()),
-                              );
-                            },
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                "See All",
-                                style: TextStyle(
-                                    color: Color.fromRGBO(145, 145, 145, 1),
-                                    fontFamily: 'Quicksand',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-
-                    //***** video streaming ******
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      height: 170,
-                      child: GridView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 9,
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 250,
-                            childAspectRatio: 3 / 2.4,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 0),
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            child: GridTile(
-                                child: Container(
-                              alignment: Alignment.center,
-                              child: Card(
-                                color: Color.fromRGBO(251, 251, 251, 1),
-                                elevation: 1.0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    _backImageVideo(),
-                                    Container(
-                                      padding: EdgeInsets.only(
-                                          left: 4.0, right: 4.0),
-                                      child: _cardBottom(false),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        UsingVideoControllerExample()),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      height: 27,
-                      width: MediaQuery.of(context).size.width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 10),
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Text(
-                              "Images",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.black,
-                                fontFamily: 'Quicksand',
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ImageDetails()),
-                              );
-                            },
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                "See All",
-                                style: TextStyle(
-                                    color: Color.fromRGBO(145, 145, 145, 1),
-                                    fontFamily: 'Quicksand',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-
-                    //******* Images **********
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      height: 230,
-                      child: GridView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 9,
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 250,
-                            childAspectRatio: 1.6,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 0),
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ImagePostDetails()),
-                              );
-                            },
-                            child: GridTile(
-                                child: Container(
-                              alignment: Alignment.center,
-                              child: Card(
-                                color: Color.fromRGBO(251, 251, 251, 1),
-                                elevation: 1.0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: <Widget>[
-                                    _backImageStream(),
-                                    Container(
-                                      padding: EdgeInsets.only(
-                                          left: 4.0, right: 4.0),
-                                      child: _cardBottom(true),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
               ),
-            ),
-          ),
-        ),
-      ),
+              Visibility(
+                  visible: isVideoViewShown,
+                  child: UsingVideoControllerExample(
+                    videoStatus: setVideoStatus,
+                  ))
+            ],
+          )),
     );
   }
 }

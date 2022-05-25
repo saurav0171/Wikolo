@@ -9,6 +9,7 @@ xmlns:tools="http://schemas.android.com/tools"
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
    <application
+        tools:replace="android:label"  
         android:label="wikolo"
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
