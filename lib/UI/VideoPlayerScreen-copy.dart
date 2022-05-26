@@ -30,16 +30,16 @@ class _UsingVideoControllerExampleState
 
   var currentAlignment = Alignment.topCenter;
 
-  var minVideoHeight = 200.0;
-  var minVideoWidth = 240.0;
+  var minVideoHeight = 100.0;
+  var minVideoWidth = 150.0;
 
-  var maxVideoHeight = 300.0;
+  var maxVideoHeight = 200.0;
 
   // This is an arbitrary value and will be changed when layout is built.
-  var maxVideoWidth = 300.0;
+  var maxVideoWidth = 250.0;
 
-  var currentVideoHeight = 300.0;
-  var currentVideoWidth = 240.0;
+  var currentVideoHeight = 200.0;
+  var currentVideoWidth = 200.0;
 
   bool isInSmallMode = false;
 
@@ -96,6 +96,7 @@ class _UsingVideoControllerExampleState
       fit: BoxFit.fill,
       autoPlay: true,
       looping: true,
+      autoDispose: false,
       deviceOrientationsAfterFullScreen: [
         DeviceOrientation.portraitDown,
         DeviceOrientation.portraitUp
@@ -445,23 +446,16 @@ class _UsingVideoControllerExampleState
       if (!isInSmallMode) {
         currentVideoWidth = maxVideoWidth;
       }
-      return Dismissible(
-        direction: DismissDirection.horizontal,
-        key: const Key('key'),
-        onDismissed: (_) => widget.videoStatus(false),
-        child: Container(
-          // height: MediaQuery.of(context).size.height,
-          // width: MediaQuery.of(context).size.width,
-          // color: Colors.black,
+      return Scaffold(
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.black,
           child: Stack(
             children: [
               Align(
                 alignment: currentAlignment,
                 child: GestureDetector(
-                  onHorizontalDragEnd: (details) => {
-                    //  alignmentAnimationController.forward(),
-                    //  widget.videoStatus(false)
-                  },
                   onVerticalDragEnd: (details) {
                     if (details.velocity.pixelsPerSecond.dy > 0) {
                       setState(() {
@@ -480,21 +474,11 @@ class _UsingVideoControllerExampleState
                       });
                     }
                   },
-                  child: Dismissible(
-                    direction: DismissDirection.horizontal,
-                    key: const Key('key'),
-                    onDismissed: (_) => widget.videoStatus(false),
-                    child: Container(
-                      width: currentVideoWidth,
-                      height: currentVideoHeight,
-                      color: Colors.black,
-                      child: AspectRatio(
-                        aspectRatio: 1.4,
-                        child: BetterPlayer(
-                          controller: betterPlayerController,
-                          key: betterPlayerKey,
-                        ),
-                      ),
+                  child: AspectRatio(
+                    aspectRatio: 1.4,
+                    child: BetterPlayer(
+                      controller: betterPlayerController,
+                      key: betterPlayerKey,
                     ),
                   ),
                 ),
