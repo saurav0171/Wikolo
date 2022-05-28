@@ -1,8 +1,11 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:convert';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wikolo/CommonFiles/common.dart';
@@ -258,11 +261,12 @@ class UploadPostState extends State<UploadPost> {
                 padding: EdgeInsets.only(
                     top: 10, left: 30.0, right: 30.0, bottom: 10),
                 child: Container(
-                  height: 300,
                   width: MediaQuery.of(context).size.width,
                   child: GridView.count(
                     crossAxisCount: 4,
                     crossAxisSpacing: 7,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 10,
                     childAspectRatio: 0.7,
                     children: [
@@ -714,15 +718,17 @@ class UploadPostState extends State<UploadPost> {
                               height: 40.0,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  Navigator.of(context).push(PageRouteBuilder(
-                                      opaque: false,
-                                      pageBuilder:
-                                          (BuildContext context, _, __) =>
-                                              ChoosePlan()));
+                                  // Navigator.of(context).push(PageRouteBuilder(
+                                  //     opaque: false,
+                                  //     pageBuilder:
+                                  //         (BuildContext context, _, __) =>
+                                  //             ChoosePlan()));
                                   // Navigator.push(
                                   //     context,
                                   //     MaterialPageRoute(
                                   //         builder: (context) => ChoosePlan()));
+                                  ShowLoader(context);
+                                  uploadPostToServer(_imageList);
                                 },
                                 child: Text(
                                   "Upload",
@@ -752,5 +758,41 @@ class UploadPostState extends State<UploadPost> {
         ),
       ),
     );
+  }
+
+  uploadPostToServer(List images) async {
+    var uri = Uri.parse("http://wikolo.codefruits.in/cwbi/");
+    http.MultipartRequest request = new http.MultipartRequest('POST', uri);
+    Map<String, String> headers = {
+      "Accept": "application/json",
+      "Authorization": "Token 4d693ba551b14da66d37d7c02df548794426b0a8"
+    }; // ignore this headers if there is no authentication
+
+//add headers
+    request.headers.addAll(headers);
+    request.fields['category'] = 'category';
+    request.fields['location'] = 'location';
+    request.fields['title'] = 'title';
+    request.fields['description'] = 'description';
+    //multipartFile = new http.MultipartFile("imagefile", stream, length, filename: basename(imageFile.path));
+    List<MultipartFile> newList = [];
+    for (int i = 0; i < images.length; i++) {
+      var pic = await http.MultipartFile.fromPath("wikimgs", images[i].path);
+      newList.add(pic);
+    }
+    request.files.addAll(newList);
+    var response = await request.send();
+    var jsonResponse = {};
+    HideLoader(context);
+    var responseObject = await http.Response.fromStream(response);
+    jsonResponse[kDataResult] = convert.jsonDecode(responseObject.body);
+    if (response.statusCode == 200) {
+      print("Image Uploaded");
+    } else {
+      print("Upload Failed");
+    }
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
   }
 }

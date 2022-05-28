@@ -5,5 +5,4 @@ import 'package:flutter/material.dart';
 
 // BuildContext notificationContext;
 var position;
-GlobalKey betterPlayerKey = GlobalKey();
 late BetterPlayerController betterPlayerController;

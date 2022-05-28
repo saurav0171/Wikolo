@@ -318,7 +318,7 @@ class _AddGurudwaraExtensionState extends State<AddGurudwaraExtension> {
   }
 
   void createUser(LoginData register, BuildContext context) async {
-    Map param = Map();
+    // Map param = Map();
     // param["fullname"] = register.firstName;
     // param["user"] = register.username;
     // param["gender"] = selectedTeam;
@@ -328,36 +328,37 @@ class _AddGurudwaraExtensionState extends State<AddGurudwaraExtension> {
     // param["password"] = register.password;
     // param["profileimg"] = selectedImage;
 
-    //   var request = http.MultipartRequest("POST", Uri.parse("http://be.codefruits.in/signup/"));
-    //  //add text fields
-    // //  request.fields["text_field"] = text;
-    //  request.fields["fullname"] = register.firstName;
-    //   request.fields["user.username"] = register.username;
-    //   request.fields["gender"] = selectedTeam;
-    //   request.fields["dateOfBirth"] = pickedDate;
-    //   request.fields["phonenumber"] = "+91${register.mobileno}";
-    //   request.fields["user.email"] = register.email;
-    //   request.fields["user.password"] = register.password;
-    //  //create multipart using filepath, string or bytes
-    //  var pic = await http.MultipartFile.fromPath("profileimg",selectedImage);
-    //  //add multipart to request
-    //  request.files.add(pic);
-    //  var response = await request.send();
+    var request = http.MultipartRequest(
+        "POST", Uri.parse("http://be.codefruits.in/signup/"));
+    //add text fields
+    //  request.fields["text_field"] = text;
+    request.fields["fullname"] = register.firstName;
+    request.fields["user.username"] = register.username;
+    request.fields["gender"] = selectedTeam;
+    request.fields["dateOfBirth"] = pickedDate;
+    request.fields["phonenumber"] = "+91${register.mobileno}";
+    request.fields["user.email"] = register.email;
+    request.fields["user.password"] = register.password;
+    //create multipart using filepath, string or bytes
+    var pic = await http.MultipartFile.fromPath("profileimg", selectedImage);
+    //add multipart to request
+    request.files.add(pic);
+    var response = await request.send();
 
-    //  //Get the response from the server
-    //  var responseData = await response.stream.toBytes();
-    //  var responseString = String.fromCharCodes(responseData);
-    //  HideLoader(context);
-    //  print(responseString);
+    //Get the response from the server
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    HideLoader(context);
+    print(responseString);
 
-    const url = "http://wikolo.codefruits.in/gwbi/";
-    var result = await CallApi("GET", param, url, context);
+    // const url = "http://wikolo.codefruits.in/gwbi/";
+    // var result = await CallApi("GET", param, url, context);
 
-    if (result[kDataCode] == "200") {
-      print(result);
-    } else {
-      HideLoader(context);
-      ShowErrorMessage(result[kDataMessage], context);
-    }
+    // if (result[kDataCode] == "200") {
+    //   print(result);
+    // } else {
+    //   HideLoader(context);
+    //   ShowErrorMessage(result[kDataMessage], context);
+    // }
   }
 }

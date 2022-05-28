@@ -4,19 +4,23 @@ import 'package:expandable/expandable.dart';
 
 import 'package:flutter/material.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/UI/ChoosePlan.dart';
 import 'package:wikolo/UI/Likes.dart';
 
-final List<String> imgList = [
-  'https://www.learningcontainer.com/wp-content/uploads/2020/08/Sample-Small-Image-PNG-file-Download.png',
-  'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
-  'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-  'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
-  'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
-  'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
-];
+// List<String> imgList = [
+//   'https://www.learningcontainer.com/wp-content/uploads/2020/08/Sample-Small-Image-PNG-file-Download.png',
+//   'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
+//   'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
+//   'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
+//   'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
+//   'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
+// ];
+List<String> imgList = [];
 
 class ImagePostDetails extends StatefulWidget {
-  const ImagePostDetails({Key? key}) : super(key: key);
+  final Map imageObject;
+  const ImagePostDetails({Key? key, required this.imageObject})
+      : super(key: key);
 
   @override
   State<ImagePostDetails> createState() => _ImagePostDetailsState();
@@ -30,24 +34,38 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
   final CarouselController _controller = CarouselController();
   ExpandableController commentController = ExpandableController();
 
-  final List<Widget> imageSliders = imgList
-      .map((item) => Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Container(
+  @override
+  void initState() {
+    super.initState();
+    List imageList = widget.imageObject[kDataWbi];
+    imgList = [];
+    for (var i = 0; i < imageList.length; i++) {
+      imgList.add(imageList[i][kDataWikImages]);
+    }
+  }
+
+  List<Widget> imageSliders() {
+    return imgList
+        .map((item) => Padding(
+              padding: const EdgeInsets.only(top: 20),
               child: Container(
-                margin: EdgeInsets.all(5.0),
-                child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                    child: Stack(
-                      children: <Widget>[
-                        Image.network(item,
-                            fit: BoxFit.fitHeight, height: 600, width: 1200.0),
-                      ],
-                    )),
+                child: Container(
+                  margin: EdgeInsets.all(5.0),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      child: Stack(
+                        children: <Widget>[
+                          Image.network(item,
+                              fit: BoxFit.fitHeight,
+                              height: 600,
+                              width: 1200.0),
+                        ],
+                      )),
+                ),
               ),
-            ),
-          ))
-      .toList();
+            ))
+        .toList();
+  }
 
   Widget setCommentSection() {
     return Padding(
@@ -300,28 +318,34 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                             child: Container(
                               child: InkWell(
                                 child: CircleAvatar(
-                                  radius: 20,
-                                  backgroundImage: AssetImage(
-                                      'assets/images/ic_demoprofile.png'),
-                                ),
+                                    radius: 20,
+                                    backgroundImage:
+                                        widget.imageObject[kDataUser]
+                                                    [kDataUserProfile] !=
+                                                null
+                                            ? NetworkImage(
+                                                widget.imageObject[kDataUser]
+                                                        [kDataUserProfile]
+                                                    [kDataUserImg])
+                                            : null),
                               ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 12, bottom: 5),
+                            padding: const EdgeInsets.only(
+                                top: 12, bottom: 5, left: 10),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  child: Center(
-                                    child: Text(
-                                      " Divya Sharma",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontFamily: 'Quicksand',
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16),
-                                    ),
+                                  child: Text(
+                                    widget.imageObject[kDataUser]
+                                        [kDataUsername],
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Quicksand',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
                                   ),
                                 ),
                                 Text(
@@ -357,7 +381,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
               children: [
                 Container(
                   child: CarouselSlider(
-                    items: imageSliders,
+                    items: imageSliders(),
                     carouselController: _controller,
                     options: CarouselOptions(
                         autoPlay: true,
@@ -515,13 +539,13 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                       ),
                     ),
                     collapsed: Text(
-                      "There are many variations of passages of Lorem Ipsum available",
+                      widget.imageObject[kDataDescription],
                       softWrap: true,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     expanded: Text(
-                      'There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.There are many variations of passages of Lorem Ipsum available, but the majority have suffered There are many variations of passages of Lorem Ipsum available, but the majority have suffered.',
+                      widget.imageObject[kDataDescription],
                       softWrap: true,
                     ),
                   ),

@@ -810,7 +810,7 @@ class _SocialBoardState extends State<SocialBoard> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Meeting()),
+                  MaterialPageRoute(builder: (context) => UploadPost()),
                 );
               },
               backgroundColor: colorLocalPink.withOpacity(0.5),
@@ -1917,7 +1917,8 @@ class _SocialBoardState extends State<SocialBoard> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              ImagePostDetails()),
+                                              ImagePostDetails(
+                                                  imageObject: {})),
                                     );
                                   },
                                   child: GridTile(

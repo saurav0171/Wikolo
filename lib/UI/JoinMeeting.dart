@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
+import 'package:wikolo/CommonFiles/common.dart';
 
 class Meeting extends StatefulWidget {
   @override
@@ -29,6 +31,9 @@ class _MeetingState extends State<Meeting> {
         onConferenceJoined: _onConferenceJoined,
         onConferenceTerminated: _onConferenceTerminated,
         onError: _onError));
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+      _joinMeeting();
+    });
   }
 
   @override
@@ -43,8 +48,12 @@ class _MeetingState extends State<Meeting> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
+            backgroundColor: colorLocalPink,
+            title: const Text('Live Streaming'),
+            leading: BackButton(
+              color: Colors.white,
+              onPressed: () => Navigator.of(context).pop(),
+            )),
         body: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 16.0,

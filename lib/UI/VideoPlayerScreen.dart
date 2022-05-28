@@ -131,7 +131,6 @@ class _UsingVideoControllerExampleState
     );
     betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     betterPlayerController.setupDataSource(_betterPlayerDataSource);
-    betterPlayerController.setBetterPlayerGlobalKey(betterPlayerKey);
     super.initState();
   }
 
@@ -481,7 +480,6 @@ class _UsingVideoControllerExampleState
                     aspectRatio: 1.4,
                     child: BetterPlayer(
                       controller: betterPlayerController,
-                      key: betterPlayerKey,
                     ),
                   ),
                 ),

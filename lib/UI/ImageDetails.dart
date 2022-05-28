@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:wikolo/ServerFiles/service_api.dart';
 import 'package:wikolo/UI/Channels.dart';
 import 'package:wikolo/UI/ImagePostDetails.dart';
 import 'package:wikolo/UI/SocialCategory.dart';
@@ -16,6 +17,7 @@ class ImageDetails extends StatefulWidget {
 
 class _ImageDetailsState extends State<ImageDetails> {
   var selectedCategory = 'All';
+  List imagesList = [];
   int channelSelectedIndex = 0;
   int radioButtonIndex = 0; // 0 for NOVALUE, 1 for VIDEO, 2 for IMAGES
   bool isVideoSelected = true;
@@ -52,6 +54,13 @@ class _ImageDetailsState extends State<ImageDetails> {
     setState(() {
       selectedCategory = category;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ShowLoader(context);
+    getImages();
   }
 
   Widget _buildListSampleItem(
@@ -550,14 +559,14 @@ class _ImageDetailsState extends State<ImageDetails> {
     );
   }
 
-  Widget _backImageStream() {
+  Widget _backImageStream(Map imgObj) {
     return Stack(children: [
       AspectRatio(
         aspectRatio: 0.83,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
-          child: Image.asset(
-            'assets/images/ic_imagestream.png',
+          child: Image.network(
+            imgObj[kDataWbi][0][kDataWikImages],
             fit: BoxFit.cover,
           ),
         ),
@@ -571,16 +580,18 @@ class _ImageDetailsState extends State<ImageDetails> {
               Container(
                 child: InkWell(
                   child: CircleAvatar(
-                    radius: 12,
-                    backgroundImage:
-                        AssetImage('assets/images/ic_demoprofile.png'),
-                  ),
+                      radius: 12,
+                      backgroundImage: imgObj[kDataUser][kDataUserProfile] !=
+                              null
+                          ? NetworkImage(
+                              imgObj[kDataUser][kDataUserProfile][kDataUserImg])
+                          : null),
                 ),
               ),
               Container(
                 child: Center(
                   child: Text(
-                    " Divya Sharma",
+                    imgObj[kDataUser][kDataUsername],
                     style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'Quicksand',
@@ -701,18 +712,22 @@ class _ImageDetailsState extends State<ImageDetails> {
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.fromLTRB(0, 16, 0, 19),
       child: GridView.builder(
-        itemCount: 10,
+        itemCount: imagesList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             childAspectRatio: Platform.isIOS ? 0.67 : 0.65,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10),
         itemBuilder: (context, index) {
+          Map imgObj = imagesList[index];
           return InkWell(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ImagePostDetails()),
+                MaterialPageRoute(
+                    builder: (context) => ImagePostDetails(
+                          imageObject: imgObj,
+                        )),
               );
             },
             child: Container(
@@ -732,7 +747,7 @@ class _ImageDetailsState extends State<ImageDetails> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  _backImageStream(),
+                  _backImageStream(imgObj),
                   Container(
                     padding: EdgeInsets.only(left: 4.0, right: 4.0),
                     child: _cardBottom(true),
@@ -1056,5 +1071,21 @@ class _ImageDetailsState extends State<ImageDetails> {
         ),
       ),
     ));
+  }
+
+  getImages() async {
+    final url = "$baseUrl/gwbi/";
+    Map param = Map();
+    var result = await CallApi("GET", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        imagesList = result[kDataResult];
+      });
+    } else {
+      HideLoader(context);
+      ShowErrorMessage(result[kDataMessage], context);
+    }
   }
 }

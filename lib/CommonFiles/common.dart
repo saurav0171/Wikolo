@@ -17,7 +17,7 @@ import 'package:wikolo/UI/uploadpost.dart';
 
 // // ******Paths********//
 // var webPath = "https://stormboard.com";
-var baseUrl = "https://ws.mim.one/";
+var baseUrl = "http://wikolo.codefruits.in";
 
 // // ******Default Stormboard Colors********//
 const colorLocalTheme = Color(0xFFFFF2ED);
@@ -139,6 +139,11 @@ const kDataLat = "lat";
 const kDataLon = "lon";
 const kDataResult = "result";
 const kDataImageUrl = "image_url";
+const kDataWbi = "wbi";
+const kDataUserProfile = "userprofile";
+const kDataUsername = "username";
+const kDataUserImg = "userimg";
+const kDataWikImages = "wikimages";
 
 // ************************************Navigation Samples************************
 // Source: https://pub.dev/packages/page_transition
