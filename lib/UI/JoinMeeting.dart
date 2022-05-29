@@ -14,7 +14,7 @@ class Meeting extends StatefulWidget {
 class _MeetingState extends State<Meeting> {
   final serverText = TextEditingController();
   final roomText = TextEditingController(text: "plugintestroom");
-  final subjectText = TextEditingController(text: "My Plugin Test Meeting");
+  final subjectText = TextEditingController(text: "Live Streaming");
   final nameText = TextEditingController(text: "Plugin Test User");
   final emailText = TextEditingController(text: "fake@email.com");
   final iosAppBarRGBAColor =

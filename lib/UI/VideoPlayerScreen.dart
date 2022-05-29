@@ -479,8 +479,8 @@ class _UsingVideoControllerExampleState
                   child: AspectRatio(
                     aspectRatio: 1.4,
                     child: BetterPlayer(
-                      controller: betterPlayerController,
-                    ),
+                        controller: betterPlayerController,
+                        key: betterPlayerKey),
                   ),
                 ),
               ),

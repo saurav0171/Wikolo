@@ -1460,8 +1460,7 @@ class _SocialBoardState extends State<SocialBoard> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) =>
-                                                  MyHomePage()),
+                                              builder: (context) => Meeting()),
                                         );
                                       },
                                       child: Row(
