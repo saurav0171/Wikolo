@@ -63,6 +63,22 @@ class _ImageDetailsState extends State<ImageDetails> {
     getImages();
   }
 
+  getImages() async {
+    final url = "$baseUrl/gwbi/";
+    Map param = Map();
+    var result = await CallApi("GET", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        imagesList = result[kDataResult];
+      });
+    } else {
+      HideLoader(context);
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
   Widget _buildListSampleItem(
       String title, int radioStatus, StateSetter setState) {
     var image = '';
@@ -1071,21 +1087,5 @@ class _ImageDetailsState extends State<ImageDetails> {
         ),
       ),
     ));
-  }
-
-  getImages() async {
-    final url = "$baseUrl/gwbi/";
-    Map param = Map();
-    var result = await CallApi("GET", param, url, context);
-    HideLoader(context);
-    if (result[kDataCode] == "200") {
-      print(result);
-      setState(() {
-        imagesList = result[kDataResult];
-      });
-    } else {
-      HideLoader(context);
-      ShowErrorMessage(result[kDataMessage], context);
-    }
   }
 }

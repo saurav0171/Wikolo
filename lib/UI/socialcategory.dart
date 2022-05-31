@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/ServerFiles/service_api.dart';
 
 class SocialCategory extends StatefulWidget {
   final Function setCategory;
@@ -12,43 +13,30 @@ class SocialCategory extends StatefulWidget {
 
 class _SocialCategoryState extends State<SocialCategory> {
   var selectedCategory = '';
-  final myImageAndCaption = [
-    ["All"],
-    ["Books"],
-    ["Electronics"],
-    ["Games"],
-    ["Music"],
-    ["Podcast"],
-    ["UI.Services"],
-    ["Health"],
-    ["Fashion"],
-    ["Jobs"],
-    ["Food"],
-    ["Lofi"],
-    ["Matrimonial"],
-    ["Beauty"],
-    ["Comedy"],
-    ["Podcast"],
-    ["UI.Services"],
-    ["Health"],
-    ["Fashion"],
-    ["Jobs"],
-    ["Food"],
-    ["Lofi"],
-    ["Matrimonial"],
-    ["Beauty"],
-    ["Comedy"],
-    ["Podcast"],
-    ["UI.Services"],
-    ["Health"],
-    ["Fashion"],
-    ["Jobs"],
-    ["Food"],
-    ["Lofi"],
-    ["Matrimonial"],
-    ["Beauty"],
-    ["Comedy"],
-  ];
+  var myImageAndCaption = [];
+
+  @override
+  void initState() {
+    super.initState();
+    ShowLoader(context);
+    getCategories();
+  }
+
+  getCategories() async {
+    final url = "$baseUrl/gwc/";
+    Map param = Map();
+    var result = await CallApi("GET", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        myImageAndCaption = result[kDataResult];
+      });
+    } else {
+      HideLoader(context);
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +87,7 @@ class _SocialCategoryState extends State<SocialCategory> {
                 (i) => InkWell(
                   onTap: () {
                     setState(() {
-                      selectedCategory = i.last;
+                      selectedCategory = i[kDataCategory];
                       widget.setCategory(selectedCategory);
                     });
                   },
@@ -112,7 +100,7 @@ class _SocialCategoryState extends State<SocialCategory> {
                         width: 80,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: selectedCategory == i.last
+                          color: selectedCategory == i[kDataCategory]
                               ? colorLocalPink
                               : Colors.white,
                           boxShadow: [
@@ -127,10 +115,10 @@ class _SocialCategoryState extends State<SocialCategory> {
                         ),
                         child: Center(
                           child: Text(
-                            i.first,
+                            i[kDataCategory],
                             style: TextStyle(
                               fontSize: 12,
-                              color: selectedCategory == i.last
+                              color: selectedCategory == i[kDataCategory]
                                   ? Colors.white
                                   : Colors.black,
                               fontFamily: 'Quicksand',

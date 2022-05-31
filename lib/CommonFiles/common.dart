@@ -144,6 +144,7 @@ const kDataUserProfile = "userprofile";
 const kDataUsername = "username";
 const kDataUserImg = "userimg";
 const kDataWikImages = "wikimages";
+const kDataCategory = "category";
 
 // ************************************Navigation Samples************************
 // Source: https://pub.dev/packages/page_transition
