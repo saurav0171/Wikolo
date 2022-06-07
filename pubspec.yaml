@@ -38,7 +38,7 @@ dependencies:
   flutter_spinkit: ^5.1.0
   shared_preferences: ^2.0.13
   flutter_launcher_icons: ^0.9.2
-  keyboard_actions: ^3.4.4
+  keyboard_actions: ^4.0.0
   http: ^0.13.3
   connectivity: ^3.0.6
   intl: ^0.17.0
@@ -62,6 +62,8 @@ dependencies:
   agora_rtc_engine: ^5.2.0
   permission_handler: ^9.2.0
   jitsi_meet: ^4.0.0
+  # flutter_stripe: ^3.0.2
+  video_thumbnail: ^0.5.0
 
 dev_dependencies:
   flutter_test:

@@ -11,7 +11,9 @@ import '../Globals/globals.dart';
 
 class UsingVideoControllerExample extends StatefulWidget {
   Function videoStatus;
-  UsingVideoControllerExample({Key? key, required this.videoStatus})
+  Map videoObj;
+  UsingVideoControllerExample(
+      {Key? key, required this.videoStatus, required this.videoObj})
       : super(key: key);
 
   @override
@@ -108,7 +110,9 @@ class _UsingVideoControllerExampleState
 
     _betterPlayerDataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
-      "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+      widget.videoObj.isEmpty
+          ? "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"
+          : widget.videoObj[kDataWikfile],
       liveStream: false,
       useAsmsSubtitles: true,
       asmsTrackNames: ["Low quality", "Not so low quality", "Medium quality"],

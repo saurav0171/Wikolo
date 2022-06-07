@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/ServerFiles/service_api.dart';
 import 'package:wikolo/UI/Channels.dart';
 import 'package:wikolo/UI/SocialCategory.dart';
 import 'package:wikolo/UI/VideoPlayerScreen.dart';
@@ -18,7 +20,10 @@ class _VideoDetailsState extends State<VideoDetails> {
   int channelSelectedIndex = 0;
   int radioButtonIndex = 0; // 0 for NOVALUE, 1 for VIDEO, 2 for IMAGES
   bool isVideoSelected = true;
+  bool isVideoViewShown = false;
+  var selectedVideoObj = {};
   bool isFree = false;
+  var videosList = [];
   final myCategoryArray = [
     ["All"],
     ["Books"],
@@ -50,6 +55,35 @@ class _VideoDetailsState extends State<VideoDetails> {
   setCategory(String category) {
     setState(() {
       selectedCategory = category;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ShowLoader(context);
+    getVideos();
+  }
+
+  getVideos() async {
+    final url = "$baseUrl/gwbv/";
+    Map param = Map();
+    var result = await CallApi("GET", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        videosList = result[kDataResult];
+      });
+    } else {
+      HideLoader(context);
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  setVideoStatus(status) {
+    setState(() {
+      isVideoViewShown = status;
     });
   }
 
@@ -716,22 +750,28 @@ class _VideoDetailsState extends State<VideoDetails> {
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.fromLTRB(0, 16, 0, 19),
       child: GridView.builder(
-        itemCount: 10,
+        itemCount: videosList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             childAspectRatio: Platform.isIOS ? 0.8 : 0.7,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10),
         itemBuilder: (context, index) {
+          var file = videosList[index];
           return InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => UsingVideoControllerExample(
-                          videoStatus: () {},
-                        )),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //       builder: (context) => UsingVideoControllerExample(
+              //             videoStatus: () {},
+              //           )),
+              // );
+
+              setState(() {
+                isVideoViewShown = true;
+                selectedVideoObj = file;
+              });
             },
             child: Container(
               height: 250,
@@ -770,310 +810,327 @@ class _VideoDetailsState extends State<VideoDetails> {
         child: Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(top: 10.0, left: 15.0),
-            child: Container(
-              padding: EdgeInsets.only(top: 0.0),
-              height: 50.0,
-              width: 50.0,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(11),
-                  bottomLeft: Radius.circular(11),
-                  topRight: Radius.circular(11),
-                  bottomRight: Radius.circular(11),
-                ),
-                color: Colors.white,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color.fromRGBO(240, 240, 240, 1),
-                    blurRadius: 9.0,
-                    spreadRadius: 1.0,
-                  ),
-                ],
-              ),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    InkWell(
-                      onTap: () {
-                        showPopUp(context);
-                      },
-                      child: Image.asset(
-                        'assets/images/ic_net.png',
-                        height: 20,
-                        width: 20,
+      appBar: !isVideoViewShown
+          ? AppBar(
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, left: 15.0),
+                  child: Container(
+                    padding: EdgeInsets.only(top: 0.0),
+                    height: 50.0,
+                    width: 50.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(11),
+                        bottomLeft: Radius.circular(11),
+                        topRight: Radius.circular(11),
+                        bottomRight: Radius.circular(11),
                       ),
-                    ),
-                  ]),
-            ),
-          ),
-        ],
-        leading: BackButton(
-          color: Colors.black,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'Videos',
-          style: TextStyle(
-            color: Colors.black,
-            fontFamily: 'Quicksand',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.only(
-                top: 15,
-              ),
-              width: MediaQuery.of(context).size.width,
-              child: Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Categories",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Quicksand',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: () {
-                        // showCategory(context);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SocialCategory(
-                                      setCategory: setCategory,
-                                    )));
-                      },
-                      child: Text(
-                        "See All",
-                        style: TextStyle(
-                          color: Color.fromRGBO(145, 145, 145, 1),
-                          fontFamily: 'Quicksand',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
+                      color: Colors.white,
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color.fromRGBO(240, 240, 240, 1),
+                          blurRadius: 9.0,
+                          spreadRadius: 1.0,
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 10),
-              height: MediaQuery.of(context).size.height * 0.08,
-              width: MediaQuery.of(context).size.width,
-              child: GridView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: myCategoryArray.length,
-                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 250,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 0),
-                itemBuilder: (context, index) {
-                  return GridTile(
-                      child: Container(
-                    alignment: Alignment.center,
-                    child: Card(
-                      color: Color.fromRGBO(251, 251, 251, 1),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           InkWell(
                             onTap: () {
-                              setState(() {
-                                selectedCategory = myCategoryArray[index].first;
-                              });
+                              showPopUp(context);
                             },
-                            child: Container(
-                              height: 35,
-                              decoration: BoxDecoration(
-                                color: selectedCategory ==
-                                        myCategoryArray[index].first
-                                    ? colorLocalPink
-                                    : Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      blurRadius: 2,
-                                      offset: Offset(0.0, 2)),
-                                ],
-                              ),
-                              child: Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    myCategoryArray[index].first,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: selectedCategory ==
-                                              myCategoryArray[index].first
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )),
+                            child: Image.asset(
+                              'assets/images/ic_net.png',
+                              height: 20,
+                              width: 20,
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ));
-                },
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(
-                top: 15,
-              ),
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Channels",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Quicksand',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                      ),
-                    ),
+                          ),
+                        ]),
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Channels()),
-                        );
-                      },
-                      child: Text(
-                        "See All",
-                        style: TextStyle(
-                          color: Color.fromRGBO(145, 145, 145, 1),
-                          fontFamily: 'Quicksand',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
+                ),
+              ],
+              leading: BackButton(
+                color: Colors.black,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Text(
+                'Videos',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Quicksand',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : null,
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(
+                    top: 15,
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Categories",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Quicksand',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-                height: 48,
-                width: MediaQuery.of(context).size.width,
-                child: Center(
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    itemCount: 9,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1,
-                      childAspectRatio: 0.36,
-                    ),
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                          right: 10,
-                        ),
-                        child: GridTile(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 4, bottom: 4),
-                            child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  channelSelectedIndex = index;
-                                });
-                              },
-                              child: Container(
-                                height: 22,
-                                width: 130,
-                                decoration: BoxDecoration(
-                                  color: channelSelectedIndex == index
-                                      ? colorLocalPink
-                                      : Colors.white,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
-                                  border: Border.all(color: Colors.white),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Colors.grey.withOpacity(0.4),
-                                        blurRadius: 1,
-                                        spreadRadius: 1,
-                                        offset: Offset(2, 4)),
-                                  ],
-                                ),
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        child: InkWell(
-                                          child: CircleAvatar(
-                                            radius: 20,
-                                            backgroundImage: AssetImage(
-                                                'assets/images/ic_demoprofile.png'),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        child: Center(
-                                          child: Text(
-                                            " Divya Sharma",
-                                            style: TextStyle(
-                                                color: channelSelectedIndex ==
-                                                        index
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                                fontFamily: 'Quicksand',
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 10),
-                                          ),
-                                        ),
-                                      ),
-                                    ]),
-                              ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            // showCategory(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SocialCategory(
+                                          setCategory: setCategory,
+                                        )));
+                          },
+                          child: Text(
+                            "See All",
+                            style: TextStyle(
+                              color: Color.fromRGBO(145, 145, 145, 1),
+                              fontFamily: 'Quicksand',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
                             ),
                           ),
                         ),
-                      );
-                    },
-                    scrollDirection: Axis.horizontal,
+                      ),
+                    ],
                   ),
-                )),
-            Expanded(child: mainVideoTile())
-          ],
-        ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(top: 10),
+                  height: MediaQuery.of(context).size.height * 0.08,
+                  width: MediaQuery.of(context).size.width,
+                  child: GridView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: myCategoryArray.length,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 250,
+                        childAspectRatio: 0.75,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 0),
+                    itemBuilder: (context, index) {
+                      return GridTile(
+                          child: Container(
+                        alignment: Alignment.center,
+                        child: Card(
+                          color: Color.fromRGBO(251, 251, 251, 1),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    selectedCategory =
+                                        myCategoryArray[index].first;
+                                  });
+                                },
+                                child: Container(
+                                  height: 35,
+                                  decoration: BoxDecoration(
+                                    color: selectedCategory ==
+                                            myCategoryArray[index].first
+                                        ? colorLocalPink
+                                        : Colors.white,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          blurRadius: 2,
+                                          offset: Offset(0.0, 2)),
+                                    ],
+                                  ),
+                                  child: Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        myCategoryArray[index].first,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: selectedCategory ==
+                                                  myCategoryArray[index].first
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      )),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ));
+                    },
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(
+                    top: 15,
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Channels",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Quicksand',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Channels()),
+                            );
+                          },
+                          child: Text(
+                            "See All",
+                            style: TextStyle(
+                              color: Color.fromRGBO(145, 145, 145, 1),
+                              fontFamily: 'Quicksand',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                    height: 48,
+                    width: MediaQuery.of(context).size.width,
+                    child: Center(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        itemCount: 9,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          childAspectRatio: 0.36,
+                        ),
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              right: 10,
+                            ),
+                            child: GridTile(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 4, bottom: 4),
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      channelSelectedIndex = index;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 22,
+                                    width: 130,
+                                    decoration: BoxDecoration(
+                                      color: channelSelectedIndex == index
+                                          ? colorLocalPink
+                                          : Colors.white,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      border: Border.all(color: Colors.white),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Colors.grey.withOpacity(0.4),
+                                            blurRadius: 1,
+                                            spreadRadius: 1,
+                                            offset: Offset(2, 4)),
+                                      ],
+                                    ),
+                                    child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            child: InkWell(
+                                              child: CircleAvatar(
+                                                radius: 20,
+                                                backgroundImage: AssetImage(
+                                                    'assets/images/ic_demoprofile.png'),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Center(
+                                              child: Text(
+                                                " Divya Sharma",
+                                                style: TextStyle(
+                                                    color:
+                                                        channelSelectedIndex ==
+                                                                index
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                    fontFamily: 'Quicksand',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 10),
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        scrollDirection: Axis.horizontal,
+                      ),
+                    )),
+                Expanded(child: mainVideoTile())
+              ],
+            ),
+          ),
+          Visibility(
+              visible: isVideoViewShown,
+              child: UsingVideoControllerExample(
+                videoStatus: setVideoStatus,
+                videoObj: selectedVideoObj,
+              ))
+        ],
       ),
     ));
   }

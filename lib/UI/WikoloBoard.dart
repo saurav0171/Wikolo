@@ -10,6 +10,7 @@ import 'package:wikolo/UI/ImagePostDetails.dart';
 import 'package:wikolo/UI/ImagesProfileDetails.dart';
 import 'package:wikolo/UI/JoinMeeting.dart';
 import 'package:wikolo/UI/LiveStreamingDetails.dart';
+import 'package:wikolo/UI/PaymentScreen.dart';
 import 'package:wikolo/UI/Sample.dart';
 import 'package:wikolo/UI/SocialCategory.dart';
 import 'package:wikolo/UI/Uploadpost.dart';
@@ -830,7 +831,7 @@ class _SocialBoardState extends State<SocialBoard> {
                           (BuildContext flexcontext,
                               BoxConstraints constraints) {
                         // print('constraints=' + constraints.toString());
-                        WidgetsBinding.instance?.addPostFrameCallback((_) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
                           // Add Your Code here.
                           setState(() {
                             top = constraints.biggest.height;
@@ -1364,27 +1365,37 @@ class _SocialBoardState extends State<SocialBoard> {
                                   ),
                                   Padding(
                                     padding: EdgeInsets.only(right: 5.0),
-                                    child: Container(
-                                      padding: EdgeInsets.only(top: 0.0),
-                                      width: tileWidth,
-                                      height: 60,
-                                      child: Column(
-                                        children: [
-                                          Image.asset(
-                                            'assets/images/market1.png',
-                                            height: 45,
-                                            width: 45,
-                                          ),
-                                          Text(
-                                            "Market Place",
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: 'Quicksand',
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 10,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PaymentScreen()),
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.only(top: 0.0),
+                                        width: tileWidth,
+                                        height: 60,
+                                        child: Column(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/market1.png',
+                                              height: 45,
+                                              width: 45,
                                             ),
-                                          ),
-                                        ],
+                                            Text(
+                                              "Market Place",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Quicksand',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1509,12 +1520,12 @@ class _SocialBoardState extends State<SocialBoard> {
                                         ),
                                         child: InkWell(
                                           onTap: () {
-                                            WidgetsBinding.instance!
+                                            WidgetsBinding.instance
                                                 .addPostFrameCallback((_) {
                                               // Add Your Code here.
                                               showPopUpFilter(context);
                                             });
-                                            SchedulerBinding.instance!
+                                            SchedulerBinding.instance
                                                 .addPostFrameCallback(
                                                     (timeStamp) {});
                                           },
@@ -1958,6 +1969,7 @@ class _SocialBoardState extends State<SocialBoard> {
                   visible: isVideoViewShown,
                   child: UsingVideoControllerExample(
                     videoStatus: setVideoStatus,
+                    videoObj: {},
                   ))
             ],
           )),

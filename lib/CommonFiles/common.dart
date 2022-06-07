@@ -17,7 +17,7 @@ import 'package:wikolo/UI/uploadpost.dart';
 
 // // ******Paths********//
 // var webPath = "https://stormboard.com";
-var baseUrl = "http://wikolo.codefruits.in";
+var baseUrl = "https://api.wikolo.com";
 
 // // ******Default Stormboard Colors********//
 const colorLocalTheme = Color(0xFFFFF2ED);
@@ -145,6 +145,7 @@ const kDataUsername = "username";
 const kDataUserImg = "userimg";
 const kDataWikImages = "wikimages";
 const kDataCategory = "category";
+const kDataWikfile = "wikfile";
 
 // ************************************Navigation Samples************************
 // Source: https://pub.dev/packages/page_transition
@@ -236,7 +237,7 @@ Spin kit Source : https://flutterappdev.com/2019/01/29/a-collection-of-loading-i
 */
 
 void ShowLoader(BuildContext context) {
-  SchedulerBinding.instance!.addPostFrameCallback((_) => showDialog(
+  SchedulerBinding.instance.addPostFrameCallback((_) => showDialog(
       context: context,
       builder: (BuildContext context) {
         return Container(
@@ -308,7 +309,7 @@ void showSnackBar(
   final String parseMessage =
       parser.parse(document.body?.text).documentElement!.text;
 
-  SchedulerBinding.instance!.addPostFrameCallback(
+  SchedulerBinding.instance.addPostFrameCallback(
       (_) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
             margin: isToast

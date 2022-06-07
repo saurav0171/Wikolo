@@ -21,16 +21,16 @@ class UploadPostState extends State<UploadPost> {
   String typeselected = "Go live";
   var buttonIndex = 1; //1 for Live, 2 for Videos, 3 for Images
   var _video;
-  var _cameraVideo;
   var _imageList;
+  var pickedVideoFile;
   late VideoPlayerController _videoPlayerController;
   late VideoPlayerController _cameraVideoPlayerController;
   ImagePicker picker = ImagePicker();
 
   pickVideo() async {
-    var pickedFile = await picker.pickVideo(source: ImageSource.gallery);
+    pickedVideoFile = await picker.pickVideo(source: ImageSource.gallery);
 
-    _video = File(pickedFile!.path);
+    _video = File(pickedVideoFile!.path);
 
     _videoPlayerController = VideoPlayerController.file(_video)
       ..initialize().then((_) {
@@ -41,14 +41,14 @@ class UploadPostState extends State<UploadPost> {
 
   // This funcion will helps you to pick a Video File from Camera
   pickVideoFromCamera() async {
-    var pickedFile = await picker.pickVideo(source: ImageSource.camera);
+    pickedVideoFile = await picker.pickVideo(source: ImageSource.camera);
 
-    _cameraVideo = File(pickedFile!.path);
+    _video = File(pickedVideoFile!.path);
 
-    _cameraVideoPlayerController = VideoPlayerController.file(_cameraVideo)
+    _videoPlayerController = VideoPlayerController.file(_video)
       ..initialize().then((_) {
         setState(() {});
-        _cameraVideoPlayerController.play();
+        _videoPlayerController.play();
       });
   }
 
@@ -728,7 +728,7 @@ class UploadPostState extends State<UploadPost> {
                                   //     MaterialPageRoute(
                                   //         builder: (context) => ChoosePlan()));
                                   ShowLoader(context);
-                                  uploadPostToServer(_imageList);
+                                  uploadPostToServer();
                                 },
                                 child: Text(
                                   "Upload",
@@ -760,12 +760,12 @@ class UploadPostState extends State<UploadPost> {
     );
   }
 
-  uploadPostToServer(List images) async {
-    var uri = Uri.parse("http://wikolo.codefruits.in/cwbi/");
+  uploadPostToServer() async {
+    var uri = Uri.parse("$baseUrl/cwbi/");
     http.MultipartRequest request = new http.MultipartRequest('POST', uri);
     Map<String, String> headers = {
       "Accept": "application/json",
-      "Authorization": "Token 4d693ba551b14da66d37d7c02df548794426b0a8"
+      "Authorization": "Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1"
     }; // ignore this headers if there is no authentication
 
 //add headers
@@ -774,13 +774,22 @@ class UploadPostState extends State<UploadPost> {
     request.fields['location'] = 'location';
     request.fields['title'] = 'title';
     request.fields['description'] = 'description';
+    request.fields['utype'] = buttonIndex == 2 ? 'video' : 'images';
     //multipartFile = new http.MultipartFile("imagefile", stream, length, filename: basename(imageFile.path));
-    List<MultipartFile> newList = [];
-    for (int i = 0; i < images.length; i++) {
-      var pic = await http.MultipartFile.fromPath("wikimgs", images[i].path);
-      newList.add(pic);
+    if (buttonIndex == 2) {
+      var pic =
+          await http.MultipartFile.fromPath("wikfile", pickedVideoFile!.path);
+      //add multipart to request
+      request.files.add(pic);
+    } else {
+      List<MultipartFile> newList = [];
+      for (int i = 0; i < _imageList.length; i++) {
+        var pic =
+            await http.MultipartFile.fromPath("wikimgs", _imageList[i].path);
+        newList.add(pic);
+      }
+      request.files.addAll(newList);
     }
-    request.files.addAll(newList);
     var response = await request.send();
     var jsonResponse = {};
     HideLoader(context);
@@ -791,8 +800,8 @@ class UploadPostState extends State<UploadPost> {
     } else {
       print("Upload Failed");
     }
-    response.stream.transform(utf8.decoder).listen((value) {
-      print(value);
-    });
+    // response.stream.transform(utf8.decoder).listen((value) {
+    //   print(value);
+    // });
   }
 }

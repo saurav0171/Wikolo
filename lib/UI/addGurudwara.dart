@@ -299,7 +299,7 @@ class _AddGurudwaraExtensionState extends State<AddGurudwaraExtension> {
                                         .unfocus();
                                     // if (loginKey.currentState!.validate()) {
                                     ShowLoader(context);
-                                    SchedulerBinding.instance!
+                                    SchedulerBinding.instance
                                         .addPostFrameCallback((_) =>
                                             createUser(loginObj, context));
                                     // }
