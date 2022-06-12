@@ -1,22 +1,33 @@
 import 'dart:async';
+import 'package:flutter_stripe/flutter_stripe.dart';
+
 import './Globals/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import './CommonFiles/common.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'CommonFiles/.env.dart';
+
 final dateFormat = DateFormat("dd/MM/yyyy");
 
-void main() => runApp(MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: appThemeColor1,
-        // Define the default font family.
-        fontFamily: '-',
-      ),
-    ));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = stripePublishableKey;
+  Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+  Stripe.urlScheme = 'flutterstripe';
+  await Stripe.instance.applySettings();
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: SplashScreen(),
+    theme: ThemeData(
+      brightness: Brightness.light,
+      primaryColor: appThemeColor1,
+      // Define the default font family.
+      fontFamily: '-',
+    ),
+  ));
+}
 
 class SplashScreen extends StatefulWidget {
   @override

@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/UI/PaymentScreen.dart';
 
 class GoLive extends StatelessWidget {
   bool isGoLive;
@@ -296,10 +297,10 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
                       setState(() {
                         letUserJoin = true;
                       });
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => UploadPost()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PaymentScreen()));
                     },
                     child: Text(
                       "Yes",

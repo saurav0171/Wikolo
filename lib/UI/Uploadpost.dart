@@ -326,7 +326,7 @@ class UploadPostState extends State<UploadPost> {
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: colorLocalPink,
           actions: <Widget>[
             TextButton(
               onPressed: () {},
@@ -334,14 +334,14 @@ class UploadPostState extends State<UploadPost> {
             ),
           ],
           leading: BackButton(
-            color: Colors.black,
+            color: Colors.white,
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Center(
             child: Text(
               'Upload a Post',
               style: TextStyle(
-                color: Colors.black,
+                color: Colors.white,
                 fontFamily: 'Quicksand',
                 fontWeight: FontWeight.bold,
               ),
