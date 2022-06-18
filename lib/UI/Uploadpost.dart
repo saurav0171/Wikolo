@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -9,10 +10,20 @@ import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/ServerFiles/service_api.dart';
 import 'package:wikolo/UI/ChoosePlan.dart';
 import 'package:wikolo/UI/Golive.dart';
 
 class UploadPost extends StatefulWidget {
+  final Map object;
+  final int updateFor; // 2 for Videos, 3 for Images
+  final Function updateVideoList;
+  const UploadPost(
+      {Key? key,
+      required this.object,
+      required this.updateFor,
+      required this.updateVideoList})
+      : super(key: key);
   @override
   UploadPostState createState() => UploadPostState();
 }
@@ -23,9 +34,27 @@ class UploadPostState extends State<UploadPost> {
   var _video;
   var _imageList;
   var pickedVideoFile;
+  TextEditingController categoryController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
   late VideoPlayerController _videoPlayerController;
   late VideoPlayerController _cameraVideoPlayerController;
   ImagePicker picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.object.isNotEmpty) {
+      setState(() {
+        buttonIndex = widget.updateFor;
+        categoryController.text = widget.object[kDataCategory];
+        titleController.text = widget.object[kDataTitle];
+        descriptionController.text = widget.object[kDataDescription];
+        locationController.text = widget.object[kDataLocation];
+      });
+    }
+  }
 
   pickVideo() async {
     pickedVideoFile = await picker.pickVideo(source: ImageSource.gallery);
@@ -461,6 +490,8 @@ class UploadPostState extends State<UploadPost> {
                 buttonIndex == 1
                     ? GoLiveExtension(
                         isGoLive: false,
+                        object: widget.object,
+                        updateData: updatePost,
                       )
                     : Column(
                         children: [
@@ -504,6 +535,8 @@ class UploadPostState extends State<UploadPost> {
                               child: TextFormField(
                                 textCapitalization: TextCapitalization.words,
                                 autofocus: false,
+                                textInputAction: TextInputAction.done,
+                                controller: categoryController,
                                 textAlign: TextAlign.left,
                                 decoration: InputDecoration(
                                   hintText: 'Choose your Category',
@@ -569,6 +602,8 @@ class UploadPostState extends State<UploadPost> {
                               child: TextField(
                                 textCapitalization: TextCapitalization.words,
                                 autofocus: false,
+                                textInputAction: TextInputAction.done,
+                                controller: locationController,
                                 textAlign: TextAlign.left,
                                 decoration: InputDecoration(
                                   hintText: 'Enter your Location',
@@ -638,6 +673,8 @@ class UploadPostState extends State<UploadPost> {
                               child: TextFormField(
                                 textCapitalization: TextCapitalization.words,
                                 autofocus: false,
+                                textInputAction: TextInputAction.done,
+                                controller: titleController,
                                 textAlign: TextAlign.left,
                                 decoration: InputDecoration(
                                   hintText: 'Enter Title',
@@ -663,9 +700,11 @@ class UploadPostState extends State<UploadPost> {
                               ),
                             ),
                           ),
-                          buttonIndex == 2
-                              ? designForVideo()
-                              : designForImage(),
+                          widget.object.isEmpty
+                              ? buttonIndex == 2
+                                  ? designForVideo()
+                                  : designForImage()
+                              : Container(),
                           Padding(
                             padding: EdgeInsets.only(
                                 top: 15.0, left: 30.0, right: 30.0),
@@ -687,6 +726,8 @@ class UploadPostState extends State<UploadPost> {
                             child: TextFormField(
                               textCapitalization: TextCapitalization.words,
                               autofocus: false,
+                              textInputAction: TextInputAction.done,
+                              controller: descriptionController,
                               keyboardType: TextInputType.multiline,
                               maxLines: 10,
                               textAlign: TextAlign.left,
@@ -728,7 +769,11 @@ class UploadPostState extends State<UploadPost> {
                                   //     MaterialPageRoute(
                                   //         builder: (context) => ChoosePlan()));
                                   ShowLoader(context);
-                                  uploadPostToServer();
+                                  if (widget.object.isNotEmpty) {
+                                    updatePost();
+                                  } else {
+                                    uploadPostToServer();
+                                  }
                                 },
                                 child: Text(
                                   "Upload",
@@ -760,6 +805,29 @@ class UploadPostState extends State<UploadPost> {
     );
   }
 
+  updatePost() async {
+    final url = "$baseUrl/uwbid/";
+    Map param = Map();
+    param['id'] = widget.object[kDataID].toString();
+    param['category'] = categoryController.text;
+    param['location'] = locationController.text;
+    param['title'] = titleController.text;
+    param['description'] = descriptionController.text;
+    param['utype'] = buttonIndex == 2 ? 'video' : 'images';
+    var result = await CallApi("PUT", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      widget.updateVideoList();
+      ShowSuccessMessage("Post Updated Successfully", context);
+      Timer(Duration(seconds: 1), () {
+        Navigator.pop(context);
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
   uploadPostToServer() async {
     var uri = Uri.parse("$baseUrl/cwbi/");
     http.MultipartRequest request = new http.MultipartRequest('POST', uri);
@@ -770,10 +838,10 @@ class UploadPostState extends State<UploadPost> {
 
 //add headers
     request.headers.addAll(headers);
-    request.fields['category'] = 'category';
-    request.fields['location'] = 'location';
-    request.fields['title'] = 'title';
-    request.fields['description'] = 'description';
+    request.fields['category'] = categoryController.text;
+    request.fields['location'] = locationController.text;
+    request.fields['title'] = titleController.text;
+    request.fields['description'] = descriptionController.text;
     request.fields['utype'] = buttonIndex == 2 ? 'video' : 'images';
     //multipartFile = new http.MultipartFile("imagefile", stream, length, filename: basename(imageFile.path));
     if (buttonIndex == 2) {

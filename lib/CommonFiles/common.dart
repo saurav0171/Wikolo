@@ -146,6 +146,14 @@ const kDataUserImg = "userimg";
 const kDataWikImages = "wikimages";
 const kDataCategory = "category";
 const kDataWikfile = "wikfile";
+const kDataImages = "images";
+const kDataVideos = "videos";
+const kDataLive = "live";
+const kDataLocation = "location";
+const kDataStreamType = "streamtype";
+const kDataPrice = "price";
+const kDataLiveStreamJoin = "livestreamjoin";
+const kDataPricePerUser = "priceperuser";
 
 // ************************************Navigation Samples************************
 // Source: https://pub.dev/packages/page_transition
@@ -239,6 +247,7 @@ Spin kit Source : https://flutterappdev.com/2019/01/29/a-collection-of-loading-i
 void ShowLoader(BuildContext context) {
   SchedulerBinding.instance.addPostFrameCallback((_) => showDialog(
       context: context,
+      useRootNavigator: true,
       builder: (BuildContext context) {
         return Container(
           height: 50,
@@ -255,7 +264,7 @@ void ShowLoader(BuildContext context) {
 }
 
 void HideLoader(BuildContext context) {
-  Navigator.pop(context);
+  Navigator.of(context, rootNavigator: true).pop();
 }
 
 void ShowErrorMessage(String message, BuildContext context) {

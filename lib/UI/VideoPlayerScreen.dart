@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:expandable/expandable.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:better_player/better_player.dart';
 import 'package:flutter/services.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/ServerFiles/service_api.dart';
 
 import '../Globals/globals.dart';
 
@@ -24,6 +26,9 @@ class UsingVideoControllerExample extends StatefulWidget {
 class _UsingVideoControllerExampleState
     extends State<UsingVideoControllerExample> with TickerProviderStateMixin {
 // Floating Video View Animation
+  TextEditingController commentTextController = TextEditingController();
+  TextEditingController commentThreadTextController = TextEditingController();
+
   late AnimationController alignmentAnimationController;
   late Animation alignmentAnimation;
 
@@ -31,7 +36,7 @@ class _UsingVideoControllerExampleState
   late Animation videoViewAnimation;
 
   var currentAlignment = Alignment.topCenter;
-
+  bool isFollowed = false;
   var minVideoHeight = 200.0;
   var minVideoWidth = 240.0;
 
@@ -160,7 +165,7 @@ class _UsingVideoControllerExampleState
           height: 1.0,
         ),
         Text(
-          "Lofi Hip Hop - Beats",
+          widget.videoObj[kDataTitle],
           style: TextStyle(
             color: Colors.black,
             fontFamily: 'Quicksand',
@@ -178,13 +183,16 @@ class _UsingVideoControllerExampleState
                   height: 10,
                   width: 10,
                 ),
-                Text(
-                  " San Francisco",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Quicksand',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Text(
+                    widget.videoObj[kDataLocation],
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Quicksand',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13),
+                  ),
                 ),
               ],
             ),
@@ -408,9 +416,22 @@ class _UsingVideoControllerExampleState
                           child: TextFormField(
                             textCapitalization: TextCapitalization.words,
                             autofocus: false,
+                            controller: commentThreadTextController,
                             textAlign: TextAlign.left,
                             decoration: InputDecoration(
                               hintText: 'Reply to this comment',
+                              suffixIcon: IconButton(
+                                  padding: EdgeInsets.all(0),
+                                  onPressed: () {
+                                    ShowLoader(context);
+                                    postReplyComment(
+                                        commentThreadTextController.text, 2);
+                                  },
+                                  icon: Icon(
+                                    Icons.send,
+                                    color: colorLocalPink,
+                                    size: 25,
+                                  )),
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20.0),
                                   borderSide: BorderSide(color: Colors.white)),
@@ -715,7 +736,7 @@ class _UsingVideoControllerExampleState
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Lofi hip hop mix - Beats",
+                                    widget.videoObj[kDataTitle],
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'Quicksand',
@@ -743,13 +764,16 @@ class _UsingVideoControllerExampleState
                                     height: 20,
                                     width: 20,
                                   ),
-                                  Text(
-                                    " San Francisco",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: 'Quicksand',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 5),
+                                    child: Text(
+                                      widget.videoObj[kDataLocation],
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'Quicksand',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -789,24 +813,33 @@ class _UsingVideoControllerExampleState
                                             child: Container(
                                               child: InkWell(
                                                 child: CircleAvatar(
-                                                  radius: 20,
-                                                  backgroundImage: AssetImage(
-                                                      'assets/images/ic_demoprofile.png'),
-                                                ),
+                                                    radius: 12,
+                                                    backgroundImage: widget
+                                                                        .videoObj[
+                                                                    kDataUser][
+                                                                kDataUserProfile] !=
+                                                            null
+                                                        ? NetworkImage(widget
+                                                                        .videoObj[
+                                                                    kDataUser][
+                                                                kDataUserProfile]
+                                                            [kDataUserImg])
+                                                        : null),
                                               ),
                                             ),
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 12, bottom: 5),
+                                                top: 12, bottom: 5, left: 7),
                                             child: Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Container(
                                                   child: Center(
                                                     child: Text(
-                                                      " Divya Sharma",
+                                                      widget.videoObj[kDataUser]
+                                                          [kDataUsername],
                                                       style: TextStyle(
                                                           color: Colors.black,
                                                           fontFamily:
@@ -830,16 +863,24 @@ class _UsingVideoControllerExampleState
                                           ),
                                         ],
                                       ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 20),
-                                        child: Text(
-                                          'Follow',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.pink,
-                                              fontFamily: 'Quicksand',
-                                              fontWeight: FontWeight.bold),
+                                      InkWell(
+                                        onTap: () {
+                                          ShowLoader(context);
+                                          followUnfollowUser(1, context);
+                                        },
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 20),
+                                          child: Text(
+                                            isFollowed ? 'Following' : 'Follow',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: isFollowed
+                                                    ? colorLocalGrey
+                                                    : colorLocalPink,
+                                                fontFamily: 'Quicksand',
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ),
                                       ),
                                     ]),
@@ -889,9 +930,22 @@ class _UsingVideoControllerExampleState
                                 child: TextFormField(
                                   textCapitalization: TextCapitalization.words,
                                   autofocus: false,
+                                  controller: commentTextController,
                                   textAlign: TextAlign.left,
                                   decoration: InputDecoration(
                                     hintText: 'Leave a Comment',
+                                    suffixIcon: IconButton(
+                                        padding: EdgeInsets.all(0),
+                                        onPressed: () {
+                                          ShowLoader(context);
+                                          postComment(
+                                              commentTextController.text);
+                                        },
+                                        icon: Icon(
+                                          Icons.send,
+                                          color: colorLocalPink,
+                                          size: 25,
+                                        )),
                                     enabledBorder: OutlineInputBorder(
                                         borderRadius:
                                             BorderRadius.circular(20.0),
@@ -1057,5 +1111,49 @@ class _UsingVideoControllerExampleState
               child: mainWidget())
           : mainWidget();
     });
+  }
+
+  followUnfollowUser(int status, context) async {
+    final url = "$baseUrl/afw/";
+    Map param = Map();
+    param['following'] = status.toString();
+    var result = await CallApi("POST", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      setState(() {
+        isFollowed = true;
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessages], context);
+    }
+  }
+
+  postComment(comment) async {
+    final url = "$baseUrl/cwbvc/";
+    Map param = Map();
+    param['videoid'] = widget.videoObj[kDataID].toString();
+    param["comment"] = comment;
+    var result = await CallApi("POST", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  postReplyComment(comment, commentId) async {
+    final url = "$baseUrl/crwbvc/";
+    Map param = Map();
+    param['commentid'] = widget.videoObj[kDataID].toString();
+    param["comment"] = comment;
+    param["replyto"] = widget.videoObj[kDataUser][kDataID].toString();
+    var result = await CallApi("POST", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
   }
 }

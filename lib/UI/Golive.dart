@@ -1,11 +1,22 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/ServerFiles/service_api.dart';
 import 'package:wikolo/UI/PaymentScreen.dart';
+import 'package:wikolo/UI/join_channel_video.dart';
 
 class GoLive extends StatelessWidget {
   bool isGoLive;
-  GoLive({Key? key, required this.isGoLive}) : super(key: key);
+  final Map object;
+  Function updateData;
+  GoLive(
+      {Key? key,
+      required this.isGoLive,
+      required this.object,
+      required this.updateData})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +48,8 @@ class GoLive extends StatelessWidget {
       ),
       body: GoLiveExtension(
         isGoLive: isGoLive,
+        object: object,
+        updateData: updateData,
       ),
     ));
   }
@@ -44,7 +57,14 @@ class GoLive extends StatelessWidget {
 
 class GoLiveExtension extends StatefulWidget {
   bool isGoLive;
-  GoLiveExtension({Key? key, required this.isGoLive}) : super(key: key);
+  final Map object;
+  Function updateData;
+  GoLiveExtension(
+      {Key? key,
+      required this.isGoLive,
+      required this.object,
+      required this.updateData})
+      : super(key: key);
 
   @override
   State<GoLiveExtension> createState() => _GoLiveExtensionState();
@@ -53,6 +73,35 @@ class GoLiveExtension extends StatefulWidget {
 class _GoLiveExtensionState extends State<GoLiveExtension> {
   bool isFree = true; // true for Free and false For Paid
   bool letUserJoin = false; // true for Yes and false For No
+  TextEditingController categoryController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
+  TextEditingController pricePerUserController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.object.isNotEmpty) {
+      setState(() {
+        categoryController.text = widget.object[kDataCategory];
+        titleController.text = widget.object[kDataTitle];
+        descriptionController.text = widget.object[kDataDescription];
+        locationController.text = widget.object[kDataLocation];
+        priceController.text = widget.object[kDataStreamType] == "paid"
+            ? widget.object[kDataPrice].toString()
+            : '';
+        pricePerUserController.text =
+            widget.object[kDataLiveStreamJoin] == "yes"
+                ? widget.object[kDataPricePerUser].toString()
+                : '';
+        isFree = widget.object[kDataStreamType] == "paid" ? false : true;
+        letUserJoin =
+            widget.object[kDataLiveStreamJoin] == "yes" ? true : false;
+      });
+    }
+  }
 
   Widget paidView() {
     return Visibility(
@@ -83,6 +132,9 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
               child: TextFormField(
                 textCapitalization: TextCapitalization.words,
                 autofocus: false,
+                controller: priceController,
+                keyboardType: TextInputType.datetime,
+                textInputAction: TextInputAction.done,
                 textAlign: TextAlign.left,
                 decoration: InputDecoration(
                   hintText: 'Enter your Price',
@@ -143,6 +195,8 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
               child: TextFormField(
                 textCapitalization: TextCapitalization.words,
                 autofocus: false,
+                controller: categoryController,
+                textInputAction: TextInputAction.done,
                 textAlign: TextAlign.left,
                 decoration: InputDecoration(
                   hintText: 'Choose your Category',
@@ -203,6 +257,8 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
               child: TextFormField(
                 textCapitalization: TextCapitalization.words,
                 autofocus: false,
+                controller: titleController,
+                textInputAction: TextInputAction.done,
                 textAlign: TextAlign.left,
                 decoration: InputDecoration(
                   hintText: 'Enter Title',
@@ -245,8 +301,10 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
             child: TextFormField(
               textCapitalization: TextCapitalization.words,
               autofocus: false,
+              controller: descriptionController,
               keyboardType: TextInputType.multiline,
               maxLines: 10,
+              textInputAction: TextInputAction.done,
               textAlign: TextAlign.left,
               decoration: InputDecoration(
                 hintText: 'Description in 250 words',
@@ -297,10 +355,10 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
                       setState(() {
                         letUserJoin = true;
                       });
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PaymentScreen()));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => PaymentScreen()));
                     },
                     child: Text(
                       "Yes",
@@ -377,6 +435,9 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
                 child: TextFormField(
                   textCapitalization: TextCapitalization.words,
                   autofocus: false,
+                  textInputAction: TextInputAction.done,
+                  keyboardType: TextInputType.datetime,
+                  controller: pricePerUserController,
                   textAlign: TextAlign.left,
                   decoration: InputDecoration(
                     hintText: 'Enter fee per user',
@@ -400,9 +461,6 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
               ),
             ),
           ),
-          SizedBox(
-            height: 40,
-          )
         ],
       ),
     );
@@ -460,6 +518,8 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
                   child: TextField(
                     textCapitalization: TextCapitalization.words,
                     autofocus: false,
+                    controller: locationController,
+                    textInputAction: TextInputAction.done,
                     textAlign: TextAlign.left,
                     decoration: InputDecoration(
                       hintText: 'Enter your Location',
@@ -563,11 +623,80 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
                   ],
                 ),
               ),
-              paidView()
+              paidView(),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 80),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.28,
+                  height: 40.0,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ShowLoader(context);
+                      updateLivePost();
+                    },
+                    child: Text(
+                      "Upload",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Quicksand',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(colorLocalPink),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                        ))),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  updateLivePost() async {
+    Map param = Map();
+    var http = "POST";
+    var url = "$baseUrl/cwbi/";
+    if (widget.object.isNotEmpty) {
+      url = "$baseUrl/uwbid/";
+      param['status'] = "l"; // l for Live and o for Offline
+      http = "PUT";
+      param['id'] = widget.object[kDataID].toString();
+    }
+
+    param['category'] = categoryController.text;
+    param['location'] = locationController.text;
+    param['title'] = titleController.text;
+    param['description'] = descriptionController.text;
+    param['price'] = priceController.text;
+    param['priceperuser'] = pricePerUserController.text;
+    param['streamtype'] = isFree ? "free" : "paid";
+    param['livestreamjoin'] = letUserJoin ? "yes" : "no";
+    param['utype'] = 'golive';
+    var result = await CallApi(http, param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      if (widget.object.isNotEmpty) {
+        widget.updateData();
+        ShowSuccessMessage("Post Updated Successfully", context);
+        Timer(Duration(seconds: 1), () {
+          Navigator.pop(context);
+        });
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => JoinChannelVideo()),
+        );
+      }
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
   }
 }

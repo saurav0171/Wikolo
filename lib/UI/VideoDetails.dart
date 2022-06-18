@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -6,6 +7,7 @@ import 'package:wikolo/CommonFiles/common.dart';
 import 'package:wikolo/ServerFiles/service_api.dart';
 import 'package:wikolo/UI/Channels.dart';
 import 'package:wikolo/UI/SocialCategory.dart';
+import 'package:wikolo/UI/Uploadpost.dart';
 import 'package:wikolo/UI/VideoPlayerScreen.dart';
 
 class VideoDetails extends StatefulWidget {
@@ -61,6 +63,10 @@ class _VideoDetailsState extends State<VideoDetails> {
   @override
   void initState() {
     super.initState();
+    updateVideos();
+  }
+
+  updateVideos() {
     ShowLoader(context);
     getVideos();
   }
@@ -76,7 +82,22 @@ class _VideoDetailsState extends State<VideoDetails> {
         videosList = result[kDataResult];
       });
     } else {
-      HideLoader(context);
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  deleteVideo(videoIndex) async {
+    final url = "$baseUrl/dwbv/";
+    Map param = Map();
+    param["id"] = videosList[videoIndex][kDataID].toString();
+    var result = await CallApi("DELETE", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        videosList.removeAt(videoIndex);
+      });
+    } else {
       ShowErrorMessage(result[kDataMessage], context);
     }
   }
@@ -85,6 +106,119 @@ class _VideoDetailsState extends State<VideoDetails> {
     setState(() {
       isVideoViewShown = status;
     });
+  }
+
+  void showPicker(index, context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: Wrap(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'WIKOLO',
+                          style: TextStyle(color: labelColor, fontSize: 18),
+                        ),
+                        TextButton(
+                            style: ButtonStyle(
+                                padding: MaterialStateProperty.all(
+                                    EdgeInsets.symmetric(
+                                        vertical: 0.0, horizontal: 0.0))),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: colorLocalGrey,
+                              size: 24,
+                            ))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 2,
+                    width: MediaQuery.of(context).size.width,
+                    color: colorLocalBackgroundLightGrey,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.photo_camera),
+                    title: Text(
+                      'Update Post',
+                      style: TextStyle(color: labelColor, fontSize: 16),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UploadPost(
+                                  object: videosList[index],
+                                  updateFor: 2,
+                                  updateVideoList: updateVideos,
+                                )),
+                      );
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 40),
+                    child: ListTile(
+                        leading: Icon(Icons.image_rounded),
+                        title: Text(
+                          'Delete Post',
+                          style: TextStyle(color: labelColor, fontSize: 16),
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Timer(const Duration(microseconds: 100), () {
+                            showAlertDialog(context, index);
+                          });
+                        }),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  showAlertDialog(BuildContext context, index) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop();
+        ShowLoader(context);
+        deleteVideo(index);
+      },
+    );
+    Widget cancelButton = TextButton(
+      child: Text("CANCEL"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("DELETE"),
+      content: Text("Are you sure to delete this video?"),
+      actions: [okButton, cancelButton],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      useRootNavigator: true,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   Widget _buildListSampleItem(
@@ -772,6 +906,9 @@ class _VideoDetailsState extends State<VideoDetails> {
                 isVideoViewShown = true;
                 selectedVideoObj = file;
               });
+            },
+            onLongPress: () {
+              showPicker(index, context);
             },
             child: Container(
               height: 250,

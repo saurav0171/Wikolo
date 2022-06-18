@@ -4,6 +4,7 @@ import 'package:expandable/expandable.dart';
 
 import 'package:flutter/material.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/ServerFiles/service_api.dart';
 import 'package:wikolo/UI/ChoosePlan.dart';
 import 'package:wikolo/UI/Likes.dart';
 
@@ -31,8 +32,11 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
   int _current = 0;
   var likeStatus = 1; //1 for nothing, 2 for like, 3 for Unlike
   bool isCommented = false;
+  bool isFollowed = false;
   final CarouselController _controller = CarouselController();
   ExpandableController commentController = ExpandableController();
+  TextEditingController commentTextController = TextEditingController();
+  TextEditingController commentThreadTextController = TextEditingController();
 
   @override
   void initState() {
@@ -40,7 +44,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
     List imageList = widget.imageObject[kDataWbi];
     imgList = [];
     for (var i = 0; i < imageList.length; i++) {
-      imgList.add(imageList[i][kDataWikImages]);
+      imgList.add(imageList[i][kDataWikfile]);
     }
   }
 
@@ -215,11 +219,24 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                                 ),
                               ]),
                           child: TextFormField(
+                            controller: commentThreadTextController,
                             textCapitalization: TextCapitalization.words,
                             autofocus: false,
                             textAlign: TextAlign.left,
                             decoration: InputDecoration(
                               hintText: 'Reply to this comment',
+                              suffixIcon: IconButton(
+                                  padding: EdgeInsets.all(0),
+                                  onPressed: () {
+                                    ShowLoader(context);
+                                    postReplyComment(
+                                        commentThreadTextController.text, 2);
+                                  },
+                                  icon: Icon(
+                                    Icons.send,
+                                    color: colorLocalPink,
+                                    size: 25,
+                                  )),
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(20.0),
                                   borderSide: BorderSide(color: Colors.white)),
@@ -361,13 +378,20 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                           ),
                         ],
                       ),
-                      Text(
-                        'Follow',
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.pink,
-                            fontFamily: 'Quicksand',
-                            fontWeight: FontWeight.bold),
+                      InkWell(
+                        onTap: () {
+                          ShowLoader(context);
+                          followUnfollowUser(1, context);
+                        },
+                        child: Text(
+                          isFollowed ? 'Following' : 'Follow',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color:
+                                  isFollowed ? colorLocalGrey : colorLocalPink,
+                              fontFamily: 'Quicksand',
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                       IconButton(
                         onPressed: () {},
@@ -440,13 +464,16 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                     height: 20,
                     width: 20,
                   ),
-                  Text(
-                    " San Francisco",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Quicksand',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5),
+                    child: Text(
+                      widget.imageObject[kDataLocation],
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Quicksand',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
                   ),
                 ],
               ),
@@ -572,6 +599,17 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                         textAlign: TextAlign.left,
                         decoration: InputDecoration(
                           hintText: 'Leave a Comment',
+                          suffixIcon: IconButton(
+                              padding: EdgeInsets.all(0),
+                              onPressed: () {
+                                ShowLoader(context);
+                                postComment(commentTextController.text);
+                              },
+                              icon: Icon(
+                                Icons.send,
+                                color: colorLocalPink,
+                                size: 25,
+                              )),
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20.0),
                               borderSide: BorderSide(color: Colors.white)),
@@ -642,5 +680,49 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
         ),
       ),
     );
+  }
+
+  followUnfollowUser(int status, context) async {
+    final url = "$baseUrl/afw/";
+    Map param = Map();
+    param['following'] = status.toString();
+    var result = await CallApi("POST", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      setState(() {
+        isFollowed = true;
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessages], context);
+    }
+  }
+
+  postComment(comment) async {
+    final url = "$baseUrl/cwbvc/";
+    Map param = Map();
+    param['imageid'] = widget.imageObject[kDataID].toString();
+    param["comment"] = comment;
+    var result = await CallApi("POST", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  postReplyComment(comment, commentId) async {
+    final url = "$baseUrl/crwbvc/";
+    Map param = Map();
+    param['commentid'] = widget.imageObject[kDataID].toString();
+    param["comment"] = comment;
+    param["replyto"] = widget.imageObject[kDataUser][kDataID].toString();
+    var result = await CallApi("POST", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
   }
 }

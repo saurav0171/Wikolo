@@ -1,6 +1,7 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
+import 'package:flutter/scheduler.dart';
 import 'package:wikolo/CommonFiles/common.dart';
 import 'package:wikolo/UI/log_sink.dart';
 import 'package:wikolo/config/agora.config.dart' as config;
@@ -29,7 +30,11 @@ class _State extends State<JoinChannelVideo> {
   void initState() {
     super.initState();
     _controller = TextEditingController(text: config.channelId);
-    _initEngine();
+    _initEngine().then((value) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        _joinChannel();
+      });
+    });
   }
 
   @override
@@ -138,31 +143,32 @@ class _State extends State<JoinChannelVideo> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  controller: _controller,
-                  decoration: const InputDecoration(hintText: 'Channel ID'),
-                ),
+                // TextField(
+                //   controller: _controller,
+                //   decoration: const InputDecoration(hintText: 'Channel ID'),
+                // ),
                 if (!kIsWeb &&
                     (defaultTargetPlatform == TargetPlatform.android ||
                         defaultTargetPlatform == TargetPlatform.iOS))
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text(
-                          'Rendered by SurfaceView \n(default TextureView): '),
-                      Switch(
-                        value: _isRenderSurfaceView,
-                        onChanged: isJoined
-                            ? null
-                            : (changed) {
-                                setState(() {
-                                  _isRenderSurfaceView = changed;
-                                });
-                              },
-                      )
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisSize: MainAxisSize.min,
+                  //   mainAxisAlignment: MainAxisAlignment.start,
+                  //   children: [
+                  //     const Text(
+                  //         'Rendered by SurfaceView \n(default TextureView): '),
+                  //     Switch(
+                  //       value: _isRenderSurfaceView,
+                  //       onChanged: isJoined
+                  //           ? null
+                  //           : (changed) {
+                  //               setState(() {
+                  //                 _isRenderSurfaceView = changed;
+                  //               });
+                  //             },
+                  //     )
+                  //   ],
+                  // ),
+                  _renderVideo(),
                 Row(
                   children: [
                     Expanded(
@@ -174,7 +180,6 @@ class _State extends State<JoinChannelVideo> {
                     )
                   ],
                 ),
-                _renderVideo(),
               ],
             ),
             if (defaultTargetPlatform == TargetPlatform.android ||

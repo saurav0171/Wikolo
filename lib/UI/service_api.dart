@@ -74,11 +74,8 @@ Future<dynamic> CallApi(
           "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1'
         });
       } else {
-        response = await http.get(Uri.parse(url + "?" + queryString), headers: {
-          "X-API-Key": key,
-          "X-STORMBOARD-MOBILEFLUTTER": "true",
-          "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
-        });
+        response = await http.get(Uri.parse(url + "?" + queryString),
+            headers: {"X-API-Key": key, "X-STORMBOARD-MOBILEFLUTTER": "true"});
       }
     } else if (httpType == "PUT") {
       if (key == null) {
@@ -86,8 +83,6 @@ Future<dynamic> CallApi(
             headers: {
               "Content-Type": "application/json",
               "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
-              "Accept": "application/json",
-              "X-STORMBOARD-MOBILEFLUTTER": "true"
             },
             body: body);
       } else {
@@ -95,51 +90,43 @@ Future<dynamic> CallApi(
             headers: {
               "Content-Type": "application/json",
               "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
-              "X-API-Key": key,
-              "X-STORMBOARD-MOBILEFLUTTER": "true",
-              "enctype": "multipart/form-data"
             },
             body: body);
       }
     } else if (httpType == "DELETE") {
       if (key == null) {
-        response = await http.delete(Uri.parse(url),
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
-              "Accept": "application/json",
-              "X-STORMBOARD-MOBILEFLUTTER": "true"
-            },
-            body: body);
+        response = await http.delete(
+          Uri.parse(url),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
+            "Accept": "application/json",
+          },
+          body: body
+        );
       } else {
-        response = await http.delete(Uri.parse(url),
-            headers: {
-              "Content-Type": "application/json",
-              "X-API-Key": key,
-              "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
-              "X-STORMBOARD-MOBILEFLUTTER": "true",
-              "enctype": "multipart/form-data"
-            },
-            body: body);
+        response = await http.delete(
+          Uri.parse(url),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
+          },
+          body: body
+        );
       }
     } else {
       if (key == null) {
         response = await http.post(Uri.parse(url),
             headers: {
               "Content-Type": "application/json",
-              "Accept": "application/json",
               "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
-              "X-STORMBOARD-MOBILEFLUTTER": "true"
             },
             body: body);
       } else {
         response = await http.post(Uri.parse(url),
             headers: {
               "Content-Type": "application/json",
-              "X-API-Key": key,
               "Authorization": 'Token b4bd31d869887c5e03dc87bd38bc045bfe1b09e1',
-              "X-STORMBOARD-MOBILEFLUTTER": "true",
-              "enctype": "multipart/form-data"
             },
             body: body);
       }

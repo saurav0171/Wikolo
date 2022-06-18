@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:wikolo/CommonFiles/common.dart';
+import 'package:wikolo/ServerFiles/service_api.dart';
 import 'package:wikolo/UI/ChoosePlan.dart';
 import 'package:wikolo/UI/Golive.dart';
 import 'package:wikolo/UI/ImageDetails.dart';
@@ -33,7 +35,11 @@ class _SocialBoardState extends State<SocialBoard> {
   bool isFree = false;
   bool isVideoViewShown = false;
   var selectedCategory = 'All';
-
+  Map wikoloObj = {};
+  List imagesPostList = [];
+  List videosPostList = [];
+  List livePostList = [];
+  var selectedVideoObj = {};
   int radioButtonIndex =
       0; // 0 for NOVALUE, 1 for RECENT, 2 for Latest, 3 for VIDEO, 4 for IMAGES
   final myCategory = [
@@ -86,6 +92,166 @@ class _SocialBoardState extends State<SocialBoard> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    updateData();
+  }
+
+  updateData() {
+    ShowLoader(context);
+    getWikoloData();
+  }
+
+  getWikoloData() async {
+    final url = "$baseUrl/ghwb/";
+    Map param = Map();
+    // param['category'] = selectedCategory;
+    var result = await CallApi("GET", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        wikoloObj = result[kDataResult];
+        imagesPostList = wikoloObj[kDataImages];
+        videosPostList = wikoloObj[kDataVideos];
+        livePostList = wikoloObj[kDataLive];
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  void showPicker(index, context, list, updateFor) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: Wrap(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'WIKOLO',
+                          style: TextStyle(color: labelColor, fontSize: 18),
+                        ),
+                        TextButton(
+                            style: ButtonStyle(
+                                padding: MaterialStateProperty.all(
+                                    EdgeInsets.symmetric(
+                                        vertical: 0.0, horizontal: 0.0))),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: colorLocalGrey,
+                              size: 24,
+                            ))
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 2,
+                    width: MediaQuery.of(context).size.width,
+                    color: colorLocalBackgroundLightGrey,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.photo_camera),
+                    title: Text(
+                      'Update Post',
+                      style: TextStyle(color: labelColor, fontSize: 16),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UploadPost(
+                                  object: list[index],
+                                  updateFor: updateFor,
+                                  updateVideoList: updateData,
+                                )),
+                      );
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 40),
+                    child: ListTile(
+                        leading: Icon(Icons.image_rounded),
+                        title: Text(
+                          'Delete Post',
+                          style: TextStyle(color: labelColor, fontSize: 16),
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Timer(const Duration(microseconds: 100), () {
+                            showAlertDialog(context, index, list, updateFor);
+                          });
+                        }),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  showAlertDialog(BuildContext context, index, list, updateFor) {
+    // set up the button
+
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop();
+        ShowLoader(context);
+        deletePost(index, list);
+      },
+    );
+    Widget cancelButton = TextButton(
+      child: Text("CANCEL"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("DELETE"),
+      content: Text("Are you sure to delete this video?"),
+      actions: [okButton, cancelButton],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      useRootNavigator: true,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  deletePost(index, list) async {
+    final url = "$baseUrl/dwbv/";
+    Map param = Map();
+    param["id"] = list[index][kDataID].toString();
+    var result = await CallApi("DELETE", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        list.removeAt(index);
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
   //********************** //
   Container _buildStoryListView(context) {
     return Container(
@@ -126,7 +292,7 @@ class _SocialBoardState extends State<SocialBoard> {
     );
   }
 
-  Widget _backImage() {
+  Widget _backImage(Map obj) {
     return AspectRatio(
       aspectRatio: 1.8,
       child: ClipRRect(
@@ -139,7 +305,7 @@ class _SocialBoardState extends State<SocialBoard> {
     );
   }
 
-  Widget _backImageVideo() {
+  Widget _backImageVideo(obj) {
     return AspectRatio(
       aspectRatio: 1.8,
       child: ClipRRect(
@@ -152,14 +318,14 @@ class _SocialBoardState extends State<SocialBoard> {
     );
   }
 
-  Widget _backImageStream() {
+  Widget _backImageStream(obj) {
     return Stack(children: [
       AspectRatio(
         aspectRatio: 0.83,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
-          child: Image.asset(
-            'assets/images/ic_imagestream.png',
+          child: Image.network(
+            obj[kDataWbi][0][kDataWikfile],
             fit: BoxFit.cover,
           ),
         ),
@@ -180,16 +346,18 @@ class _SocialBoardState extends State<SocialBoard> {
                 Container(
                   child: InkWell(
                     child: CircleAvatar(
-                      radius: 12,
-                      backgroundImage:
-                          AssetImage('assets/images/ic_demoprofile.png'),
-                    ),
+                        radius: 12,
+                        backgroundImage: obj[kDataUser][kDataUserProfile] !=
+                                null
+                            ? NetworkImage(
+                                obj[kDataUser][kDataUserProfile][kDataUserImg])
+                            : null),
                   ),
                 ),
                 Container(
                   child: Center(
                     child: Text(
-                      " Divya Sharma",
+                      obj[kDataUser][kDataUsername],
                       style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'Quicksand',
@@ -212,7 +380,7 @@ class _SocialBoardState extends State<SocialBoard> {
     ]);
   }
 
-  Widget _cardBottom(bool isImage) {
+  Widget _cardBottom(bool isImage, Map obj) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +389,7 @@ class _SocialBoardState extends State<SocialBoard> {
           height: 1.0,
         ),
         Text(
-          "Lofi Hip Hop - Beats",
+          obj.isNotEmpty ? obj[kDataTitle] : "Lofi Hip Hop - Beats",
           style: TextStyle(
             color: Colors.black,
             fontFamily: 'Quicksand',
@@ -239,13 +407,16 @@ class _SocialBoardState extends State<SocialBoard> {
                   height: 10,
                   width: 10,
                 ),
-                Text(
-                  " San Francisco",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Quicksand',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13),
+                Padding(
+                  padding: const EdgeInsets.only(left: 2),
+                  child: Text(
+                    obj.isNotEmpty ? obj[kDataLocation] : "San Fransisco",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Quicksand',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13),
+                  ),
                 ),
               ],
             ),
@@ -273,21 +444,27 @@ class _SocialBoardState extends State<SocialBoard> {
                 Container(
                   child: InkWell(
                     child: CircleAvatar(
-                      radius: 12,
-                      backgroundImage:
-                          AssetImage('assets/images/ic_demoprofile.png'),
-                    ),
+                        radius: 12,
+                        backgroundImage: obj.isNotEmpty
+                            ? NetworkImage(
+                                obj[kDataUser][kDataUserProfile][kDataUserImg])
+                            : null),
                   ),
                 ),
-                Container(
-                  child: Center(
-                    child: Text(
-                      " Divya Sharma",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Quicksand',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Container(
+                    child: Center(
+                      child: Text(
+                        obj.isNotEmpty
+                            ? obj[kDataUser][kDataUsername]
+                            : "Divya Sharma",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Quicksand',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12),
+                      ),
                     ),
                   ),
                 ),
@@ -807,15 +984,22 @@ class _SocialBoardState extends State<SocialBoard> {
     return MaterialApp(
       home: Scaffold(
           backgroundColor: Colors.white,
-          floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => UploadPost()),
-                );
-              },
-              backgroundColor: colorLocalPink.withOpacity(0.5),
-              child: Icon(Icons.add)),
+          floatingActionButton: !isVideoViewShown
+              ? FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UploadPost(
+                                object: {},
+                                updateFor: 0,
+                                updateVideoList: () {},
+                              )),
+                    );
+                  },
+                  backgroundColor: colorLocalPink.withOpacity(0.5),
+                  child: Icon(Icons.add))
+              : null,
           body: Stack(
             children: [
               NestedScrollView(
@@ -1668,297 +1852,354 @@ class _SocialBoardState extends State<SocialBoard> {
                           ),
 
                           //******* start divider with one space **********************
-                          Container(
-                            padding: EdgeInsets.only(left: 10, right: 10),
-                            height: 27,
-                            width: MediaQuery.of(context).size.width,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(left: 10),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Text(
-                                    "Live Streaming",
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.black,
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              LiveStreamingDetails()),
-                                    );
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      "See All",
-                                      style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(145, 145, 145, 1),
-                                          fontFamily: 'Quicksand',
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11),
-                                    ),
+                          livePostList.isNotEmpty
+                              ? Container(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  height: 27,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(left: 10),
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.5,
+                                        child: Text(
+                                          "Live Streaming",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.black,
+                                            fontFamily: 'Quicksand',
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LiveStreamingDetails()),
+                                          );
+                                        },
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            "See All",
+                                            style: TextStyle(
+                                                color: Color.fromRGBO(
+                                                    145, 145, 145, 1),
+                                                fontFamily: 'Quicksand',
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11),
+                                          ),
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 )
-                              ],
-                            ),
-                          ),
+                              : Container(),
 
                           //******* Live Streaming **********
-                          Container(
-                            padding: EdgeInsets.only(left: 10, right: 10),
-                            width: MediaQuery.of(context).size.width,
-                            height: 170,
-                            child: GridView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 9,
-                              gridDelegate:
-                                  SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 285,
-                                      childAspectRatio: 3 / 2.4,
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 0),
-                              itemBuilder: (context, index) {
-                                return GridTile(
-                                    child: Container(
-                                  alignment: Alignment.center,
-                                  child: Card(
-                                    color: Color.fromRGBO(251, 251, 251, 1),
-                                    elevation: 1.0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        _backImage(),
-                                        Container(
-                                          padding: EdgeInsets.only(
-                                              left: 4.0, right: 4.0),
-                                          child: _cardBottom(false),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ));
-                              },
-                            ),
-                          ),
-
-                          Container(
-                            padding: EdgeInsets.only(left: 10, right: 10),
-                            height: 27,
-                            width: MediaQuery.of(context).size.width,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(left: 10),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Text(
-                                    "Videos",
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.black,
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => VideoDetails()),
-                                    );
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      "See All",
-                                      style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(145, 145, 145, 1),
-                                          fontFamily: 'Quicksand',
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11),
-                                    ),
+                          livePostList.isNotEmpty
+                              ? Container(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 170,
+                                  child: GridView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: livePostList.length,
+                                    gridDelegate:
+                                        SliverGridDelegateWithMaxCrossAxisExtent(
+                                            maxCrossAxisExtent: 285,
+                                            childAspectRatio: 3 / 2.4,
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 0),
+                                    itemBuilder: (context, index) {
+                                      Map obj = livePostList[index];
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    JoinChannelVideo()),
+                                          );
+                                        },
+                                        onLongPress: () {
+                                          showPicker(
+                                              index, context, livePostList, 1);
+                                        },
+                                        child: GridTile(
+                                            child: Container(
+                                          alignment: Alignment.center,
+                                          child: Card(
+                                            color: Color.fromRGBO(
+                                                251, 251, 251, 1),
+                                            elevation: 1.0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                _backImage(obj),
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      left: 4.0, right: 4.0),
+                                                  child:
+                                                      _cardBottom(false, obj),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )),
+                                      );
+                                    },
                                   ),
                                 )
-                              ],
-                            ),
-                          ),
+                              : Container(),
+
+                          videosPostList.length > 0
+                              ? Container(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  height: 27,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(left: 10),
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.5,
+                                        child: Text(
+                                          "Videos",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.black,
+                                            fontFamily: 'Quicksand',
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    VideoDetails()),
+                                          );
+                                        },
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            "See All",
+                                            style: TextStyle(
+                                                color: Color.fromRGBO(
+                                                    145, 145, 145, 1),
+                                                fontFamily: 'Quicksand',
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : Container(),
 
                           //***** video streaming ******
-                          Container(
-                            padding: EdgeInsets.only(left: 10, right: 10),
-                            height: 170,
-                            child: GridView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 9,
-                              gridDelegate:
-                                  SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 250,
-                                      childAspectRatio: 3 / 2.4,
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 0),
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  child: GridTile(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Card(
-                                      color: Color.fromRGBO(251, 251, 251, 1),
-                                      elevation: 1.0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          _backImageVideo(),
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                                left: 4.0, right: 4.0),
-                                            child: _cardBottom(false),
+                          videosPostList.length > 0
+                              ? Container(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  height: 170,
+                                  child: GridView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: videosPostList.length,
+                                    gridDelegate:
+                                        SliverGridDelegateWithMaxCrossAxisExtent(
+                                            maxCrossAxisExtent: 250,
+                                            childAspectRatio: 3 / 2.4,
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 0),
+                                    itemBuilder: (context, index) {
+                                      Map obj = videosPostList[index];
+                                      return InkWell(
+                                        child: GridTile(
+                                            child: Container(
+                                          alignment: Alignment.center,
+                                          child: Card(
+                                            color: Color.fromRGBO(
+                                                251, 251, 251, 1),
+                                            elevation: 1.0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                _backImageVideo(obj),
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      left: 4.0, right: 4.0),
+                                                  child:
+                                                      _cardBottom(false, obj),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  )),
-                                  onTap: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //       builder: (context) =>
-                                    //           UsingVideoControllerExample()),
-                                    // );
-                                    setState(() {
-                                      isVideoViewShown = true;
-                                    });
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-
-                          Container(
-                            padding: EdgeInsets.only(left: 10, right: 10),
-                            height: 27,
-                            width: MediaQuery.of(context).size.width,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(left: 10),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  child: Text(
-                                    "Images",
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.black,
-                                      fontFamily: 'Quicksand',
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => ImageDetails()),
-                                    );
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      "See All",
-                                      style: TextStyle(
-                                          color:
-                                              Color.fromRGBO(145, 145, 145, 1),
-                                          fontFamily: 'Quicksand',
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 11),
-                                    ),
+                                        )),
+                                        onTap: () {
+                                          // Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //       builder: (context) =>
+                                          //           UsingVideoControllerExample()),
+                                          // );
+                                          setState(() {
+                                            isVideoViewShown = true;
+                                            selectedVideoObj = obj;
+                                          });
+                                        },
+                                        onLongPress: () {
+                                          showPicker(index, context,
+                                              videosPostList, 2);
+                                        },
+                                      );
+                                    },
                                   ),
                                 )
-                              ],
-                            ),
-                          ),
+                              : Container(),
+
+                          imagesPostList.length > 0
+                              ? Container(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  height: 27,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(left: 10),
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.5,
+                                        child: Text(
+                                          "Images",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.black,
+                                            fontFamily: 'Quicksand',
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ImageDetails()),
+                                          );
+                                        },
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            "See All",
+                                            style: TextStyle(
+                                                color: Color.fromRGBO(
+                                                    145, 145, 145, 1),
+                                                fontFamily: 'Quicksand',
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : Container(),
 
                           //******* Images **********
-                          Container(
-                            padding: EdgeInsets.only(left: 10, right: 10),
-                            height: 230,
-                            child: GridView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 9,
-                              gridDelegate:
-                                  SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent: 250,
-                                      childAspectRatio: 1.6,
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 0),
-                              itemBuilder: (context, index) {
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ImagePostDetails(
-                                                  imageObject: {})),
-                                    );
-                                  },
-                                  child: GridTile(
-                                      child: Container(
-                                    alignment: Alignment.center,
-                                    child: Card(
-                                      color: Color.fromRGBO(251, 251, 251, 1),
-                                      elevation: 1.0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          _backImageStream(),
-                                          Container(
-                                            padding: EdgeInsets.only(
-                                                left: 4.0, right: 4.0),
-                                            child: _cardBottom(true),
+                          imagesPostList.length > 0
+                              ? Container(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  height: 230,
+                                  child: GridView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: imagesPostList.length,
+                                    gridDelegate:
+                                        SliverGridDelegateWithMaxCrossAxisExtent(
+                                            maxCrossAxisExtent: 250,
+                                            childAspectRatio: 1.6,
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 0),
+                                    itemBuilder: (context, index) {
+                                      Map obj = imagesPostList[index];
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ImagePostDetails(
+                                                        imageObject:
+                                                            imagesPostList[
+                                                                index])),
+                                          );
+                                        },
+                                        onLongPress: () {
+                                          showPicker(index, context,
+                                              imagesPostList, 3);
+                                        },
+                                        child: GridTile(
+                                            child: Container(
+                                          alignment: Alignment.center,
+                                          child: Card(
+                                            color: Color.fromRGBO(
+                                                251, 251, 251, 1),
+                                            elevation: 1.0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                _backImageStream(obj),
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      left: 4.0, right: 4.0),
+                                                  child: _cardBottom(true, obj),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  )),
-                                );
-                              },
-                            ),
-                          ),
+                                        )),
+                                      );
+                                    },
+                                  ),
+                                )
+                              : Container(),
                         ],
                       ),
                     ),
@@ -1969,7 +2210,7 @@ class _SocialBoardState extends State<SocialBoard> {
                   visible: isVideoViewShown,
                   child: UsingVideoControllerExample(
                     videoStatus: setVideoStatus,
-                    videoObj: {},
+                    videoObj: selectedVideoObj,
                   ))
             ],
           )),
