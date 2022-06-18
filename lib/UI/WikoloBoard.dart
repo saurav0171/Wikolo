@@ -29,6 +29,7 @@ class SocialBoard extends StatefulWidget {
 }
 
 class _SocialBoardState extends State<SocialBoard> {
+  TextEditingController categoryController = TextEditingController();
   var top = 0.0;
   bool isRecentSort = true;
   bool isVideoSelected = true;
@@ -758,7 +759,7 @@ class _SocialBoardState extends State<SocialBoard> {
             builder: (BuildContext context, StateSetter setState) {
               return Container(
                 color: Colors.white,
-                height: 500,
+                height: 275,
                 width: 600,
                 child: Column(
                   children: <Widget>[
@@ -792,6 +793,7 @@ class _SocialBoardState extends State<SocialBoard> {
                         ),
                         child: TextFormField(
                           textAlign: TextAlign.left,
+                          controller: categoryController,
                           autofocus: false,
                           obscureText: true,
                           decoration: InputDecoration(
@@ -858,93 +860,93 @@ class _SocialBoardState extends State<SocialBoard> {
                         ),
                       ),
                     ),
-                    Column(children: <Widget>[
-                      _buildListSampleItem("    Video", 3, setState),
-                      _buildListSampleItem("    Image", 4, setState),
-                    ]),
-                    Padding(
-                      padding: EdgeInsets.only(top: 15.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Live",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Quicksand',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(top: 5),
-                      width: MediaQuery.of(context).size.width * 0.65,
-                      height: 80,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.28,
-                            height: 40.0,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  isFree = false;
-                                });
-                              },
-                              child: Text(
-                                "Paid",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(isFree
-                                          ? colorLocalDarkGrey
-                                          : colorLocalPink),
-                                  shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                  ))),
-                            ),
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.28,
-                            height: 40.0,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  isFree = true;
-                                });
-                              },
-                              child: Text(
-                                "Free",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'Quicksand',
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(!isFree
-                                          ? colorLocalDarkGrey
-                                          : colorLocalPink),
-                                  shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                  ))),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Column(children: <Widget>[
+                    //   _buildListSampleItem("    Video", 3, setState),
+                    //   _buildListSampleItem("    Image", 4, setState),
+                    // ]),
+                    // Padding(
+                    //   padding: EdgeInsets.only(top: 15.0),
+                    //   child: Align(
+                    //     alignment: Alignment.centerLeft,
+                    //     child: Text(
+                    //       "Live",
+                    //       style: TextStyle(
+                    //         color: Colors.black,
+                    //         fontFamily: 'Quicksand',
+                    //         fontWeight: FontWeight.bold,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    // Container(
+                    //   padding: EdgeInsets.only(top: 5),
+                    //   width: MediaQuery.of(context).size.width * 0.65,
+                    //   height: 80,
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    //     crossAxisAlignment: CrossAxisAlignment.center,
+                    //     children: <Widget>[
+                    //       Container(
+                    //         width: MediaQuery.of(context).size.width * 0.28,
+                    //         height: 40.0,
+                    //         child: ElevatedButton(
+                    //           onPressed: () {
+                    //             setState(() {
+                    //               isFree = false;
+                    //             });
+                    //           },
+                    //           child: Text(
+                    //             "Paid",
+                    //             style: TextStyle(
+                    //               color: Colors.white,
+                    //               fontFamily: 'Quicksand',
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //           style: ButtonStyle(
+                    //               backgroundColor:
+                    //                   MaterialStateProperty.all<Color>(isFree
+                    //                       ? colorLocalDarkGrey
+                    //                       : colorLocalPink),
+                    //               shape: MaterialStateProperty.all<
+                    //                       RoundedRectangleBorder>(
+                    //                   RoundedRectangleBorder(
+                    //                 borderRadius: BorderRadius.circular(18.0),
+                    //               ))),
+                    //         ),
+                    //       ),
+                    //       Container(
+                    //         width: MediaQuery.of(context).size.width * 0.28,
+                    //         height: 40.0,
+                    //         child: ElevatedButton(
+                    //           onPressed: () {
+                    //             setState(() {
+                    //               isFree = true;
+                    //             });
+                    //           },
+                    //           child: Text(
+                    //             "Free",
+                    //             style: TextStyle(
+                    //               color: Colors.white,
+                    //               fontFamily: 'Quicksand',
+                    //               fontWeight: FontWeight.bold,
+                    //             ),
+                    //           ),
+                    //           style: ButtonStyle(
+                    //               backgroundColor:
+                    //                   MaterialStateProperty.all<Color>(!isFree
+                    //                       ? colorLocalDarkGrey
+                    //                       : colorLocalPink),
+                    //               shape: MaterialStateProperty.all<
+                    //                       RoundedRectangleBorder>(
+                    //                   RoundedRectangleBorder(
+                    //                 borderRadius: BorderRadius.circular(18.0),
+                    //               ))),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     Padding(
                       padding: EdgeInsets.only(top: 20),
                       child: Container(
@@ -954,6 +956,11 @@ class _SocialBoardState extends State<SocialBoard> {
                         child: RaisedButton(
                           onPressed: () {
                             Navigator.pop(context);
+                            setState(() {
+                              selectedCategory = categoryController.text;
+                            });
+                            ShowLoader(context);
+                            getWikoloData();
                           },
                           shape: RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(26.0)),
@@ -993,7 +1000,7 @@ class _SocialBoardState extends State<SocialBoard> {
                           builder: (context) => UploadPost(
                                 object: {},
                                 updateFor: 0,
-                                updateVideoList: () {},
+                                updateVideoList: updateData,
                               )),
                     );
                   },

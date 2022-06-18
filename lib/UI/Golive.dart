@@ -22,6 +22,7 @@ class GoLive extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -468,193 +469,189 @@ class _GoLiveExtensionState extends State<GoLiveExtension> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: widget.isGoLive
-          ? MediaQuery.of(context).size.height
-          : MediaQuery.of(context).size.height - 120,
-      decoration: BoxDecoration(
-          // color: Color.fromRGBO(252, 252, 252, 1),
-          ),
-      child: Scrollbar(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 15.0, left: 30.0, right: 30.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Location",
-                    style: TextStyle(
-                      color: Colors.black,
+    return SingleChildScrollView(
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+            // color: Color.fromRGBO(252, 252, 252, 1),
+            ),
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 15.0, left: 30.0, right: 30.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Location",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Quicksand',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 10.0, left: 30.0, right: 30.0),
+              child: Container(
+                padding: EdgeInsets.only(top: 0.0),
+                height: 50.0,
+                width: MediaQuery.of(context).size.width * 0.85,
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(5),
+                      bottomLeft: Radius.circular(5),
+                      topRight: Radius.circular(5),
+                      bottomRight: Radius.circular(5),
+                    ),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(240, 240, 240, 1),
+                        blurRadius: 9.0,
+                        spreadRadius: 1.0,
+                      ),
+                    ]),
+                child: TextField(
+                  textCapitalization: TextCapitalization.words,
+                  autofocus: false,
+                  controller: locationController,
+                  textInputAction: TextInputAction.done,
+                  textAlign: TextAlign.left,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your Location',
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.white)),
+                    disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(color: Colors.white)),
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: colorLocalPink)),
+                    fillColor: Color(0xFFF3F3F3),
+                    suffixIcon: Icon(
+                      Icons.my_location,
+                      color: colorLocalPink,
+                    ),
+                    filled: true,
+                    hintStyle: TextStyle(
+                      color: Colors.grey,
                       fontFamily: 'Quicksand',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 10.0, left: 30.0, right: 30.0),
-                child: Container(
-                  padding: EdgeInsets.only(top: 0.0),
-                  height: 50.0,
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(5),
-                        bottomLeft: Radius.circular(5),
-                        topRight: Radius.circular(5),
-                        bottomRight: Radius.circular(5),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 15.0, left: 30.0, right: 30.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Stream Type",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontFamily: 'Quicksand',
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(top: 5),
+              width: MediaQuery.of(context).size.width * 0.65,
+              height: 80,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.28,
+                    height: 40.0,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          isFree = false;
+                        });
+                      },
+                      child: Text(
+                        "Paid",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Quicksand',
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              isFree ? colorLocalDarkGrey : colorLocalPink),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18.0),
+                          ))),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.28,
+                    height: 40.0,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          isFree = true;
+                        });
+                      },
+                      child: Text(
+                        "Free",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Quicksand',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              !isFree ? colorLocalDarkGrey : colorLocalPink),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18.0),
+                          ))),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            paidView(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 80),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.28,
+                height: 40.0,
+                child: ElevatedButton(
+                  onPressed: () {
+                    ShowLoader(context);
+                    updateLivePost();
+                  },
+                  child: Text(
+                    "Upload",
+                    style: TextStyle(
                       color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(240, 240, 240, 1),
-                          blurRadius: 9.0,
-                          spreadRadius: 1.0,
-                        ),
-                      ]),
-                  child: TextField(
-                    textCapitalization: TextCapitalization.words,
-                    autofocus: false,
-                    controller: locationController,
-                    textInputAction: TextInputAction.done,
-                    textAlign: TextAlign.left,
-                    decoration: InputDecoration(
-                      hintText: 'Enter your Location',
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(color: Colors.white)),
-                      disabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(color: Colors.white)),
-                      focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: colorLocalPink)),
-                      fillColor: Color(0xFFF3F3F3),
-                      suffixIcon: Icon(
-                        Icons.my_location,
-                        color: colorLocalPink,
-                      ),
-                      filled: true,
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                        fontFamily: 'Quicksand',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 15.0, left: 30.0, right: 30.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Stream Type",
-                    style: TextStyle(
-                      color: Colors.black,
                       fontFamily: 'Quicksand',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(colorLocalPink),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ))),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(top: 5),
-                width: MediaQuery.of(context).size.width * 0.65,
-                height: 80,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.28,
-                      height: 40.0,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            isFree = false;
-                          });
-                        },
-                        child: Text(
-                          "Paid",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Quicksand',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                isFree ? colorLocalDarkGrey : colorLocalPink),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                            ))),
-                      ),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.28,
-                      height: 40.0,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            isFree = true;
-                          });
-                        },
-                        child: Text(
-                          "Free",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Quicksand',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                !isFree ? colorLocalDarkGrey : colorLocalPink),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                            ))),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              paidView(),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 80),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.28,
-                  height: 40.0,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ShowLoader(context);
-                      updateLivePost();
-                    },
-                    child: Text(
-                      "Upload",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Quicksand',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(colorLocalPink),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18.0),
-                        ))),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
