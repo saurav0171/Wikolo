@@ -352,7 +352,7 @@ class UploadPostState extends State<UploadPost> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: colorLocalPink,
@@ -865,6 +865,11 @@ class UploadPostState extends State<UploadPost> {
     jsonResponse[kDataResult] = convert.jsonDecode(responseObject.body);
     if (response.statusCode == 200) {
       print("Image Uploaded");
+      widget.updateVideoList();
+      ShowSuccessMessage("Post Uploaded Successfully", context);
+      Timer(Duration(seconds: 1), () {
+        Navigator.pop(context);
+      });
     } else {
       print("Upload Failed");
     }
