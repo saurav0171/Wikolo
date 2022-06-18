@@ -85,6 +85,8 @@ class _SocialBoardState extends State<SocialBoard> {
     setState(() {
       selectedCategory = category;
     });
+    ShowLoader(context);
+    getWikoloData();
   }
 
   setVideoStatus(status) {
@@ -1815,6 +1817,8 @@ class _SocialBoardState extends State<SocialBoard> {
                                               selectedCategory =
                                                   myTextArray[index].first;
                                             });
+                                            ShowLoader(context);
+                                            getWikoloData();
                                           },
                                           child: Container(
                                             height: 35,
