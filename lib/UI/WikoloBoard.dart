@@ -12,6 +12,7 @@ import 'package:wikolo/UI/ImagePostDetails.dart';
 import 'package:wikolo/UI/ImagesProfileDetails.dart';
 import 'package:wikolo/UI/JoinMeeting.dart';
 import 'package:wikolo/UI/LiveStreamingDetails.dart';
+import 'package:wikolo/UI/Maps.dart';
 import 'package:wikolo/UI/PaymentScreen.dart';
 import 'package:wikolo/UI/Sample.dart';
 import 'package:wikolo/UI/SocialCategory.dart';
@@ -1127,7 +1128,14 @@ class _SocialBoardState extends State<SocialBoard> {
                                         height: 30,
                                         width: 30,
                                         child: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        MapsScreen()),
+                                              );
+                                            },
                                             icon: Icon(Icons.map_outlined)),
                                       ),
                                       Padding(
