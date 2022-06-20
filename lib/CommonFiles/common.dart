@@ -154,6 +154,9 @@ const kDataStreamType = "streamtype";
 const kDataPrice = "price";
 const kDataLiveStreamJoin = "livestreamjoin";
 const kDataPricePerUser = "priceperuser";
+const kDataComment = "comment";
+const kDataReply = "reply";
+const kDataCount = "count";
 
 // ************************************Navigation Samples************************
 // Source: https://pub.dev/packages/page_transition

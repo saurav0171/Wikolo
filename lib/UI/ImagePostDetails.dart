@@ -596,6 +596,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                       child: TextFormField(
                         textCapitalization: TextCapitalization.words,
                         autofocus: false,
+                        controller: commentTextController,
                         textAlign: TextAlign.left,
                         decoration: InputDecoration(
                           hintText: 'Leave a Comment',
@@ -698,7 +699,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
   }
 
   postComment(comment) async {
-    final url = "$baseUrl/cwbvc/";
+    final url = "$baseUrl/cwbic/";
     Map param = Map();
     param['imageid'] = widget.imageObject[kDataID].toString();
     param["comment"] = comment;
@@ -712,11 +713,11 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
   }
 
   postReplyComment(comment, commentId) async {
-    final url = "$baseUrl/crwbvc/";
+    final url = "$baseUrl/crwbic/";
     Map param = Map();
     param['commentid'] = widget.imageObject[kDataID].toString();
     param["comment"] = comment;
-    param["replyto"] = widget.imageObject[kDataUser][kDataID].toString();
+    param["ireplyto"] = widget.imageObject[kDataUser][kDataID].toString();
     var result = await CallApi("POST", param, url, context);
     HideLoader(context);
     if (result[kDataCode] == "200") {
