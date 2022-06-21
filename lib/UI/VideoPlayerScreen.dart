@@ -183,6 +183,7 @@ class _UsingVideoControllerExampleState
       setState(() {
         List replyList = result[kDataResult];
         Map obj = commentsList[index];
+        obj[kDataCount] = replyList.length;
         obj[kDataReply] = replyList;
         commentsList.removeAt(index);
         commentsList.insert(index, obj);
@@ -341,7 +342,7 @@ class _UsingVideoControllerExampleState
             String username = '';
             if (index == 0) {
               comment = commentObj[kDataComment];
-              image = commentObj[kDataUser][kDataUserProfile].isNotEmpty
+              image = commentObj[kDataUser][kDataUserProfile] != null
                   ? commentObj[kDataUser][kDataUserProfile][kDataUserImg]
                   : '';
               username = commentObj[kDataUser][kDataUsername];

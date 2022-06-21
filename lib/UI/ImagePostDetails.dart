@@ -33,6 +33,8 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
   var likeStatus = 1; //1 for nothing, 2 for like, 3 for Unlike
   bool isCommented = false;
   bool isFollowed = false;
+  List commentsList = [];
+  List controllerList = [];
   final CarouselController _controller = CarouselController();
   ExpandableController commentController = ExpandableController();
   TextEditingController commentTextController = TextEditingController();
@@ -45,6 +47,55 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
     imgList = [];
     for (var i = 0; i < imageList.length; i++) {
       imgList.add(imageList[i][kDataWikfile]);
+    }
+    ShowLoader(context);
+    getComments();
+  }
+
+  getComments() async {
+    final url = "$baseUrl/gwbic/";
+    Map param = Map();
+    param['pid'] = widget.imageObject[kDataID].toString();
+    var result = await CallApi("GET", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        commentsList = result[kDataResult];
+        controllerList = [];
+        for (var i = 0; i < commentsList.length; i++) {
+          Map obj = commentsList[i];
+          obj[kDataReply] = [];
+          commentsList.removeAt(i);
+          commentsList.insert(i, obj);
+          TextEditingController commentThreadTextController =
+              TextEditingController();
+          controllerList.add(commentThreadTextController);
+        }
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  getReplies(commentId, index) async {
+    final url = "$baseUrl/gwbric/";
+    Map param = Map();
+    param['cid'] = commentId.toString();
+    var result = await CallApi("GET", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      print(result);
+      setState(() {
+        List replyList = result[kDataResult];
+        Map obj = commentsList[index];
+        obj[kDataCount] = replyList.length;
+        obj[kDataReply] = replyList;
+        commentsList.removeAt(index);
+        commentsList.insert(index, obj);
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
     }
   }
 
@@ -71,7 +122,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
         .toList();
   }
 
-  Widget setCommentSection() {
+  Widget setCommentSection(commentObj, commentIndex) {
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Container(
@@ -88,35 +139,57 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
         ),
         child: ListView.builder(
           padding: EdgeInsets.symmetric(vertical: 10),
-          itemCount: 5,
+          itemCount: commentObj[kDataReply].length + 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
+            String comment = '';
+            String image = '';
+            String username = '';
+            if (index == 0) {
+              comment = commentObj[kDataComment];
+              image = commentObj[kDataUser][kDataUserProfile] != null
+                  ? commentObj[kDataUser][kDataUserProfile][kDataUserImg]
+                  : '';
+              username = commentObj[kDataUser][kDataUsername];
+            } else if (commentObj[kDataReply].isNotEmpty &&
+                index < commentObj[kDataReply].length + 1) {
+              comment = commentObj[kDataReply][index - 1][kDataComment];
+              image = commentObj[kDataReply][index - 1][kDataUser]
+                          [kDataUserProfile] !=
+                      null
+                  ? commentObj[kDataReply][index - 1][kDataUser]
+                      [kDataUserProfile][kDataUserImg]
+                  : '';
+              username =
+                  commentObj[kDataReply][index - 1][kDataUser][kDataUsername];
+            }
             return Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
               child: Container(
-                height: index != 4 ? 120 : 60,
+                // height: index != 4 ? 120 : 60,
                 width: MediaQuery.of(context).size.width,
-                child: index != 4
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: (index % 2 == 0) ? 40 : 0),
-                                child: Row(
+                child: index != (commentObj[kDataReply].length + 1)
+                    ? Padding(
+                        padding:
+                            EdgeInsets.only(left: (index % 2 == 0) ? 40 : 0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Container(
                                       child: InkWell(
                                         child: CircleAvatar(
-                                          radius: 20,
-                                          backgroundImage: AssetImage(
-                                              'assets/images/ic_demoprofile.png'),
-                                        ),
+                                            radius: 12,
+                                            backgroundImage: image.isNotEmpty
+                                                ? NetworkImage(image)
+                                                : null),
                                       ),
                                     ),
                                     Padding(
@@ -125,15 +198,20 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Container(
-                                            child: Center(
-                                              child: Text(
-                                                " Divya Sharma",
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontFamily: 'Quicksand',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Container(
+                                              child: Center(
+                                                child: Text(
+                                                  username,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontFamily: 'Quicksand',
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16),
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -171,91 +249,120 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                                     ),
                                   ],
                                 ),
-                              ),
-                              Visibility(
-                                visible: (index % 2 != 0),
-                                child: TextButton(
-                                  onPressed: () {},
-                                  child: Text(
-                                    'Reply',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: colorLocalGrey,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Quicksand',
+                                Visibility(
+                                  visible: (index % 2 != 0),
+                                  child: TextButton(
+                                    onPressed: () {},
+                                    child: Text(
+                                      'Reply',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: colorLocalGrey,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Quicksand',
+                                      ),
                                     ),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
-                          Text(
-                            'When one door of happiness closes, another opens, but often we look so long at the closed door that we do not see the one that has been opened for us.@Divya',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Quicksand',
+                                )
+                              ],
                             ),
-                          ),
-                        ],
+                            Text(
+                              comment,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Quicksand',
+                              ),
+                            ),
+                          ],
+                        ),
                       )
                     : Padding(
                         padding:
                             EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
-                        child: Container(
-                          padding: EdgeInsets.only(top: 0.0),
-                          height: 50.0,
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(25)),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  blurRadius: 9.0,
-                                  spreadRadius: 1.0,
+                        child: Column(
+                          children: [
+                            commentObj[kDataReply].length !=
+                                    commentObj[kDataCount]
+                                ? Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        ShowLoader(context);
+                                        getReplies(
+                                            commentObj[kDataID], commentIndex);
+                                      },
+                                      child: Center(
+                                        child: Text(
+                                            'View ${commentObj[kDataCount]} Replies',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: colorLocalGrey)),
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                            Container(
+                              padding: EdgeInsets.only(top: 0.0),
+                              height: 50.0,
+                              width: MediaQuery.of(context).size.width * 0.85,
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(25)),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      blurRadius: 9.0,
+                                      spreadRadius: 1.0,
+                                    ),
+                                  ]),
+                              child: TextFormField(
+                                textCapitalization: TextCapitalization.words,
+                                autofocus: false,
+                                controller: controllerList[commentIndex],
+                                textAlign: TextAlign.left,
+                                decoration: InputDecoration(
+                                  hintText: 'Reply to this comment',
+                                  suffixIcon: IconButton(
+                                      padding: EdgeInsets.all(0),
+                                      onPressed: () {
+                                        ShowLoader(context);
+                                        postReplyComment(
+                                            controllerList[commentIndex].text,
+                                            commentsList[commentIndex][kDataID],
+                                            commentIndex);
+                                      },
+                                      icon: Icon(
+                                        Icons.send,
+                                        color: colorLocalPink,
+                                        size: 25,
+                                      )),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      borderSide:
+                                          BorderSide(color: Colors.white)),
+                                  disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      borderSide:
+                                          BorderSide(color: Colors.white)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      borderSide:
+                                          BorderSide(color: colorLocalPink)),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontFamily: 'Quicksand',
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ]),
-                          child: TextFormField(
-                            controller: commentThreadTextController,
-                            textCapitalization: TextCapitalization.words,
-                            autofocus: false,
-                            textAlign: TextAlign.left,
-                            decoration: InputDecoration(
-                              hintText: 'Reply to this comment',
-                              suffixIcon: IconButton(
-                                  padding: EdgeInsets.all(0),
-                                  onPressed: () {
-                                    ShowLoader(context);
-                                    postReplyComment(
-                                        commentThreadTextController.text, 2);
-                                  },
-                                  icon: Icon(
-                                    Icons.send,
-                                    color: colorLocalPink,
-                                    size: 25,
-                                  )),
-                              enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  borderSide: BorderSide(color: Colors.white)),
-                              disabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  borderSide: BorderSide(color: Colors.white)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  borderSide:
-                                      BorderSide(color: colorLocalPink)),
-                              fillColor: Colors.white,
-                              filled: true,
-                              hintStyle: TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'Quicksand',
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
               ),
@@ -661,15 +768,20 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                                 commentController.toggle();
                               }),
                         ),
-                        collapsed: setCommentSection(),
-                        expanded: ListView.builder(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            itemCount: 4,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return setCommentSection();
-                            })),
+                        collapsed: commentsList.isNotEmpty
+                            ? setCommentSection(commentsList[0], 0)
+                            : Container(),
+                        expanded: commentsList.isNotEmpty
+                            ? ListView.builder(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                itemCount: commentsList.length,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  Map obj = commentsList[index];
+                                  return setCommentSection(obj, index);
+                                })
+                            : Container()),
                   ),
                   SizedBox(
                     height: 5,
@@ -704,25 +816,29 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
     param['imageid'] = widget.imageObject[kDataID].toString();
     param["comment"] = comment;
     var result = await CallApi("POST", param, url, context);
-    HideLoader(context);
+
     if (result[kDataCode] == "200") {
       print(result);
+      getComments();
     } else {
+      HideLoader(context);
       ShowErrorMessage(result[kDataMessage], context);
     }
   }
 
-  postReplyComment(comment, commentId) async {
+  postReplyComment(comment, commentId, commentIndex) async {
     final url = "$baseUrl/crwbic/";
     Map param = Map();
-    param['commentid'] = widget.imageObject[kDataID].toString();
+    param['commentid'] = commentId.toString();
     param["comment"] = comment;
     param["ireplyto"] = widget.imageObject[kDataUser][kDataID].toString();
     var result = await CallApi("POST", param, url, context);
-    HideLoader(context);
+
     if (result[kDataCode] == "200") {
       print(result);
+      getReplies(commentId, commentIndex);
     } else {
+      HideLoader(context);
       ShowErrorMessage(result[kDataMessage], context);
     }
   }
