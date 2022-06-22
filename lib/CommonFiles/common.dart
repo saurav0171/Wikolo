@@ -157,6 +157,7 @@ const kDataPricePerUser = "priceperuser";
 const kDataComment = "comment";
 const kDataReply = "reply";
 const kDataCount = "count";
+const kDataImageId = "imageid";
 
 // ************************************Navigation Samples************************
 // Source: https://pub.dev/packages/page_transition

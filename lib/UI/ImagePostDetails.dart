@@ -592,9 +592,8 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                 children: [
                   InkWell(
                       onTap: () {
-                        setState(() {
-                          likeStatus = likeStatus != 2 ? 2 : 1;
-                        });
+                        ShowLoader(context);
+                        likeUnlikePost(context);
                       },
                       child: Icon(
                         Icons.thumb_up_alt_rounded,
@@ -806,7 +805,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
         isFollowed = true;
       });
     } else {
-      ShowErrorMessage(result[kDataMessages], context);
+      ShowErrorMessage(result[kDataMessage], context);
     }
   }
 
@@ -839,6 +838,25 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
       getReplies(commentId, commentIndex);
     } else {
       HideLoader(context);
+      ShowErrorMessage(result[kDataResult][kDataMessage], context);
+    }
+  }
+
+  likeUnlikePost(context) async {
+    final url = "$baseUrl/cwbli/";
+    Map param = Map();
+    param['imageid'] = widget.imageObject[kDataID].toString();
+    var result = await CallApi("POST", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      setState(() {
+        if (result[kDataResult][kDataImageId] != null) {
+          likeStatus = 2;
+        } else {
+          likeStatus = 1;
+        }
+      });
+    } else {
       ShowErrorMessage(result[kDataMessage], context);
     }
   }

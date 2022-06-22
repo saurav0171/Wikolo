@@ -632,4 +632,23 @@ class _ImageProfileDetailsState extends State<ImageProfileDetails> {
       ),
     );
   }
+
+  //   likeUnlikePost(context) async {
+  //   final url = "$baseUrl/cwbli/";
+  //   Map param = Map();
+  //   param['imageid'] = widget.imageObject[kDataID].toString();
+  //   var result = await CallApi("POST", param, url, context);
+  //   HideLoader(context);
+  //   if (result[kDataCode] == "200") {
+  //     setState(() {
+  //       if (result[kDataResult][kDataImageId] != null) {
+  //         likeStatus = 2;
+  //       } else {
+  //         likeStatus = 1;
+  //       }
+  //     });
+  //   } else {
+  //     ShowErrorMessage(result[kDataMessage], context);
+  //   }
+  // }
 }

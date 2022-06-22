@@ -1236,7 +1236,7 @@ class _UsingVideoControllerExampleState
         isFollowed = true;
       });
     } else {
-      ShowErrorMessage(result[kDataMessages], context);
+      ShowErrorMessage(result[kDataMessage], context);
     }
   }
 
