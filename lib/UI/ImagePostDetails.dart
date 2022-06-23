@@ -30,6 +30,7 @@ class ImagePostDetails extends StatefulWidget {
 class _ImagePostDetailsState extends State<ImagePostDetails> {
   List<String> optionList = ['option1', 'option2', 'option3'];
   int _current = 0;
+  String totalLikes = "";
   var likeStatus = 1; //1 for nothing, 2 for like, 3 for Unlike
   bool isCommented = false;
   bool isFollowed = false;
@@ -44,6 +45,9 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
   void initState() {
     super.initState();
     List imageList = widget.imageObject[kDataWbi];
+    totalLikes = widget.imageObject[kDataTimageId] != null
+        ? widget.imageObject[kDataTimageId][0][kDataTotalLikes].toString()
+        : "0";
     imgList = [];
     for (var i = 0; i < imageList.length; i++) {
       imgList.add(imageList[i][kDataWikfile]);
@@ -611,7 +615,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                         );
                       },
                       child: Text(
-                        '400k likes',
+                        '$totalLikes like(s)',
                         style: TextStyle(
                           color: Colors.grey,
                           fontFamily: 'Quicksand',

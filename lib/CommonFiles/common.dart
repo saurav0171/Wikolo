@@ -158,6 +158,8 @@ const kDataComment = "comment";
 const kDataReply = "reply";
 const kDataCount = "count";
 const kDataImageId = "imageid";
+const kDataTimageId = "timageid";
+const kDataTotalLikes = "totallikes";
 
 // ************************************Navigation Samples************************
 // Source: https://pub.dev/packages/page_transition
