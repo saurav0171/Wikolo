@@ -711,7 +711,7 @@ class _UsingVideoControllerExampleState
                                 Padding(
                                   padding: EdgeInsets.only(left: 5, right: 7),
                                   child: Text(
-                                    '40k',
+                                    commentsList.length.toString(),
                                     style: TextStyle(
                                       color: Colors.grey,
                                       fontFamily: 'Quicksand',

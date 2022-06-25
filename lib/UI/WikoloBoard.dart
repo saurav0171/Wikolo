@@ -385,6 +385,9 @@ class _SocialBoardState extends State<SocialBoard> {
   }
 
   Widget _cardBottom(bool isImage, Map obj) {
+    String totalLikes = obj[kDataTimageId] != null
+        ? obj[kDataTimageId][0][kDataTotalLikes].toString()
+        : "0";
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,7 +431,7 @@ class _SocialBoardState extends State<SocialBoard> {
         ),
         SizedBox(height: 1.0),
         Text(
-          '400k Views',
+          '$totalLikes View(s)',
           style: TextStyle(
             color: Colors.grey,
             fontFamily: 'Quicksand',

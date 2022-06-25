@@ -644,7 +644,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                   Padding(
                     padding: EdgeInsets.only(left: 5),
                     child: Text(
-                      '40k',
+                      commentsList.length.toString(),
                       style: TextStyle(
                         color: Colors.grey,
                         fontFamily: 'Quicksand',
