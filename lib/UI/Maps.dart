@@ -47,6 +47,9 @@ class _MapsScreenState extends State<MapsScreen> {
       'assets/images/clouds-1.png',
       'assets/images/ray.png',
       'assets/images/sun.png',
+      'assets/images/night.png',
+      'assets/images/autumn.png',
+      'assets/images/spring.gif',
       'assets/images/weathersprites.png',
     ]);
 
@@ -54,7 +57,7 @@ class _MapsScreenState extends State<MapsScreen> {
     String json = await DefaultAssetBundle.of(context)
         .loadString('assets/weathersprites.json');
     _sprites = SpriteSheet(
-      image: _images['assets/images/weathersprites.png']!,
+      image: _images['assets/images/autumn.png']!,
       jsonDefinition: json,
     );
   }
@@ -89,7 +92,7 @@ class _MapsScreenState extends State<MapsScreen> {
       setState(() {
         assetsLoaded = true;
         weatherWorld = WeatherWorld();
-        weatherWorld.weatherType = WeatherType.sun;
+        weatherWorld.weatherType = WeatherType.snow;
       });
     });
   }
@@ -163,9 +166,16 @@ class _MapsScreenState extends State<MapsScreen> {
               ignoring: true,
               child: Opacity(
                 opacity: 0.5,
-                child: SpriteWidget(
-                  weatherWorld,
-                ),
+                child: true
+                    ? SpriteWidget(
+                        weatherWorld,
+                      )
+                    : Image.asset(
+                        "assets/images/autumn.gif",
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             // Padding(
