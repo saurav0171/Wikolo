@@ -460,14 +460,38 @@ class _UsingVideoControllerExampleState
                                 )
                               ],
                             ),
-                            Text(
-                              comment,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Quicksand',
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  comment,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Quicksand',
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      ShowLoader(context);
+                                      if (index == 0) {
+                                        deleteComment(
+                                            commentObj[kDataID], commentIndex);
+                                      } else {
+                                        deleteReply(
+                                            commentObj[kDataReply][index - 1]
+                                                [kDataID],
+                                            commentIndex,
+                                            index - 1);
+                                      }
+                                    },
+                                    icon: Icon(
+                                      Icons.delete,
+                                      size: 20,
+                                      color: colorLocalGrey,
+                                    ))
+                              ],
                             ),
                           ],
                         ),
@@ -641,9 +665,11 @@ class _UsingVideoControllerExampleState
                               children: [
                                 InkWell(
                                     onTap: () {
-                                      setState(() {
-                                        likeStatus = likeStatus != 2 ? 2 : 1;
-                                      });
+                                      ShowLoader(context);
+                                      likeUnlikePost(context, "l");
+                                      // setState(() {
+                                      //   likeStatus = likeStatus != 2 ? 2 : 1;
+                                      // });
                                     },
                                     child: Icon(
                                       Icons.thumb_up_alt_rounded,
@@ -669,9 +695,11 @@ class _UsingVideoControllerExampleState
                                 ),
                                 InkWell(
                                     onTap: () {
-                                      setState(() {
-                                        likeStatus = likeStatus != 3 ? 3 : 1;
-                                      });
+                                      ShowLoader(context);
+                                      likeUnlikePost(context, "d");
+                                      // setState(() {
+                                      //   likeStatus = likeStatus != 3 ? 3 : 1;
+                                      // });
                                     },
                                     child: Icon(
                                       Icons.thumb_down_alt_rounded,
@@ -1268,6 +1296,62 @@ class _UsingVideoControllerExampleState
       getReplies(commentId, commentIndex);
     } else {
       HideLoader(context);
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  deleteComment(commentId, commentIndex) async {
+    final url = "$baseUrl/dwbivc/";
+    Map param = Map();
+    param['utype'] = 'video';
+    param['pid'] = commentId.toString();
+    var result = await CallApi("DELETE", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      setState(() {
+        commentsList.removeAt(commentIndex);
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  deleteReply(commentId, commentIndex, replyIndex) async {
+    final url = "$baseUrl/dwbivrc/";
+    Map param = Map();
+    param['utype'] = 'video';
+    param['cid'] = widget.videoObj[kDataID].toString();
+    param["id"] = commentId.toString();
+    var result = await CallApi("DELETE", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      setState(() {
+        Map obj = commentsList[commentIndex];
+        obj[kDataReply].removeAt(replyIndex);
+        commentsList.removeAt(commentIndex);
+        commentsList.insert(commentIndex, obj);
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  likeUnlikePost(context, status) async {
+    final url = "$baseUrl/cwblv/";
+    Map param = Map();
+    param['videoid'] = widget.videoObj[kDataID].toString();
+    param['status'] = status;
+    var result = await CallApi("POST", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      setState(() {
+        // if (result[kDataResult][kDataImageId] != null) {
+        //   likeStatus = 2;
+        // } else {
+        //   likeStatus = 1;
+        // }
+      });
+    } else {
       ShowErrorMessage(result[kDataMessage], context);
     }
   }

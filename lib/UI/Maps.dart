@@ -55,7 +55,7 @@ class _MapsScreenState extends State<MapsScreen> {
 
     // Load the sprite sheet, which contains snowflakes and rain drops.
     String json = await DefaultAssetBundle.of(context)
-        .loadString('assets/weathersprites.json');
+        .loadString('assets/weathersprites-A.json');
     _sprites = SpriteSheet(
       image: _images['assets/images/autumn.png']!,
       jsonDefinition: json,
@@ -171,10 +171,10 @@ class _MapsScreenState extends State<MapsScreen> {
                         weatherWorld,
                       )
                     : Image.asset(
-                        "assets/images/autumn.gif",
+                        "assets/images/night.png",
                         height: MediaQuery.of(context).size.height,
                         width: MediaQuery.of(context).size.width,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       ),
               ),
             ),

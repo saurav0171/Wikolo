@@ -270,14 +270,38 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                                 )
                               ],
                             ),
-                            Text(
-                              comment,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Quicksand',
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  comment,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Quicksand',
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      ShowLoader(context);
+                                      if (index == 0) {
+                                        deleteComment(
+                                            commentObj[kDataID], commentIndex);
+                                      } else {
+                                        deleteReply(
+                                            commentObj[kDataReply][index - 1]
+                                                [kDataID],
+                                            commentIndex,
+                                            index - 1);
+                                      }
+                                    },
+                                    icon: Icon(
+                                      Icons.delete,
+                                      size: 20,
+                                      color: colorLocalGrey,
+                                    ))
+                              ],
                             ),
                           ],
                         ),
@@ -843,6 +867,42 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
     } else {
       HideLoader(context);
       ShowErrorMessage(result[kDataResult][kDataMessage], context);
+    }
+  }
+
+  deleteComment(commentId, commentIndex) async {
+    final url = "$baseUrl/dwbivc/";
+    Map param = Map();
+    param['utype'] = 'images';
+    param['pid'] = commentId.toString();
+    var result = await CallApi("DELETE", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      setState(() {
+        commentsList.removeAt(commentIndex);
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
+    }
+  }
+
+  deleteReply(commentId, commentIndex, replyIndex) async {
+    final url = "$baseUrl/dwbivrc/";
+    Map param = Map();
+    param['utype'] = 'video';
+    param['cid'] = widget.imageObject[kDataID].toString();
+    param["id"] = commentId.toString();
+    var result = await CallApi("DELETE", param, url, context);
+    HideLoader(context);
+    if (result[kDataCode] == "200") {
+      setState(() {
+        Map obj = commentsList[commentIndex];
+        obj[kDataReply].removeAt(replyIndex);
+        commentsList.removeAt(commentIndex);
+        commentsList.insert(commentIndex, obj);
+      });
+    } else {
+      ShowErrorMessage(result[kDataMessage], context);
     }
   }
 
