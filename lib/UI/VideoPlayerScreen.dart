@@ -13,9 +13,13 @@ import '../Globals/globals.dart';
 
 class UsingVideoControllerExample extends StatefulWidget {
   Function videoStatus;
+  Function updateVideoList;
   Map videoObj;
   UsingVideoControllerExample(
-      {Key? key, required this.videoStatus, required this.videoObj})
+      {Key? key,
+      required this.videoStatus,
+      required this.videoObj,
+      required this.updateVideoList})
       : super(key: key);
 
   @override
@@ -30,6 +34,9 @@ class _UsingVideoControllerExampleState
   TextEditingController commentThreadTextController = TextEditingController();
   List commentsList = [];
   List controllerList = [];
+  int totalLikes = 0;
+  int totalDislikes = 0;
+  int totalViews = 0;
   late AnimationController alignmentAnimationController;
   late Animation alignmentAnimation;
 
@@ -142,6 +149,20 @@ class _UsingVideoControllerExampleState
     betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     betterPlayerController.setupDataSource(_betterPlayerDataSource);
     super.initState();
+    totalLikes = widget.videoObj[kDataTotalLikeOrDislike] != null
+        ? widget.videoObj[kDataTotalLikeOrDislike][0][kDataTotalLikes]
+        : 0;
+    totalDislikes = widget.videoObj[kDataTotalLikeOrDislike] != null
+        ? widget.videoObj[kDataTotalLikeOrDislike][0][kDataTotalDislikes]
+        : 0;
+    likeStatus = widget.videoObj[kDataLikeOrDsislike] == "nodata"
+        ? 1
+        : widget.videoObj[kDataLikeOrDsislike][0][kDataLikev] == "l"
+            ? 2
+            : 3;
+    totalViews = widget.videoObj[kDataTotalViews] != null
+        ? widget.videoObj[kDataTotalViews][0][kDataTotalViews]
+        : 0;
     ShowLoader(context);
     getComments();
   }
@@ -681,7 +702,7 @@ class _UsingVideoControllerExampleState
                                 Padding(
                                   padding: EdgeInsets.only(left: 5, right: 7),
                                   child: Text(
-                                    '400k',
+                                    totalLikes.toString(),
                                     style: TextStyle(
                                       color: Colors.grey,
                                       fontFamily: 'Quicksand',
@@ -711,7 +732,7 @@ class _UsingVideoControllerExampleState
                                 Padding(
                                   padding: EdgeInsets.only(left: 5, right: 7),
                                   child: Text(
-                                    '40',
+                                    totalDislikes.toString(),
                                     style: TextStyle(
                                       color: Colors.grey,
                                       fontFamily: 'Quicksand',
@@ -768,7 +789,7 @@ class _UsingVideoControllerExampleState
                                   child: Align(
                                       alignment: Alignment.center,
                                       child: Text(
-                                        '40k Views',
+                                        '${totalViews.toString()} Views',
                                         style: TextStyle(
                                           fontSize: 10,
                                           color: Colors.black,
@@ -1320,7 +1341,7 @@ class _UsingVideoControllerExampleState
     final url = "$baseUrl/dwbivrc/";
     Map param = Map();
     param['utype'] = 'video';
-    param['cid'] = widget.videoObj[kDataID].toString();
+    param['cid'] = commentsList[commentIndex][kDataID].toString();
     param["id"] = commentId.toString();
     var result = await CallApi("DELETE", param, url, context);
     HideLoader(context);
@@ -1345,12 +1366,17 @@ class _UsingVideoControllerExampleState
     HideLoader(context);
     if (result[kDataCode] == "200") {
       setState(() {
-        // if (result[kDataResult][kDataImageId] != null) {
-        //   likeStatus = 2;
-        // } else {
-        //   likeStatus = 1;
-        // }
+        if (result[kDataResult][kDataTotal_Likes] > totalLikes) {
+          likeStatus = 2;
+        } else if (result[kDataResult][kDataTotal_Dislikes] > totalDislikes) {
+          likeStatus = 3;
+        } else {
+          likeStatus = 1;
+        }
+        totalLikes = result[kDataResult][kDataTotal_Likes];
+        totalDislikes = result[kDataResult][kDataTotal_Dislikes];
       });
+      widget.updateVideoList();
     } else {
       ShowErrorMessage(result[kDataMessage], context);
     }

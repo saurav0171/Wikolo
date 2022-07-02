@@ -686,7 +686,7 @@ class _SocialBoardState extends State<SocialBoard> {
               child: Column(
                 children: <Widget>[
                   _buildListSampleItem("    Recent", 1, setState),
-                  _buildListSampleItem("    Latest", 2, setState),
+                  _buildListSampleItem("    Popular", 2, setState),
                   Padding(
                     padding: EdgeInsets.only(top: 20),
                     child: Container(
@@ -2233,6 +2233,7 @@ class _SocialBoardState extends State<SocialBoard> {
                   child: UsingVideoControllerExample(
                     videoStatus: setVideoStatus,
                     videoObj: selectedVideoObj,
+                    updateVideoList: updateData,
                   ))
             ],
           )),

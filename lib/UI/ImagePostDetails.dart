@@ -30,7 +30,7 @@ class ImagePostDetails extends StatefulWidget {
 class _ImagePostDetailsState extends State<ImagePostDetails> {
   List<String> optionList = ['option1', 'option2', 'option3'];
   int _current = 0;
-  String totalLikes = "";
+  int totalLikes = 0;
   var likeStatus = 1; //1 for nothing, 2 for like, 3 for Unlike
   bool isCommented = false;
   bool isFollowed = false;
@@ -46,8 +46,8 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
     super.initState();
     List imageList = widget.imageObject[kDataWbi];
     totalLikes = widget.imageObject[kDataTimageId] != null
-        ? widget.imageObject[kDataTimageId][0][kDataTotalLikes].toString()
-        : "0";
+        ? widget.imageObject[kDataTimageId][0][kDataTotalLikes]
+        : 0;
     imgList = [];
     for (var i = 0; i < imageList.length; i++) {
       imgList.add(imageList[i][kDataWikfile]);
@@ -639,7 +639,7 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
                         );
                       },
                       child: Text(
-                        '$totalLikes like(s)',
+                        '${totalLikes.toString()} like(s)',
                         style: TextStyle(
                           color: Colors.grey,
                           fontFamily: 'Quicksand',
@@ -889,8 +889,8 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
   deleteReply(commentId, commentIndex, replyIndex) async {
     final url = "$baseUrl/dwbivrc/";
     Map param = Map();
-    param['utype'] = 'video';
-    param['cid'] = widget.imageObject[kDataID].toString();
+    param['utype'] = 'images';
+    param['cid'] = commentsList[commentIndex][kDataID].toString();
     param["id"] = commentId.toString();
     var result = await CallApi("DELETE", param, url, context);
     HideLoader(context);
@@ -914,11 +914,12 @@ class _ImagePostDetailsState extends State<ImagePostDetails> {
     HideLoader(context);
     if (result[kDataCode] == "200") {
       setState(() {
-        if (result[kDataResult][kDataImageId] != null) {
+        if (result[kDataResult][kDataTotal_Likes] > totalLikes) {
           likeStatus = 2;
         } else {
           likeStatus = 1;
         }
+        totalLikes = result[kDataResult][kDataTotal_Likes];
       });
     } else {
       ShowErrorMessage(result[kDataMessage], context);

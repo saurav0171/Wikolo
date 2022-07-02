@@ -1266,6 +1266,7 @@ class _VideoDetailsState extends State<VideoDetails> {
               child: UsingVideoControllerExample(
                 videoStatus: setVideoStatus,
                 videoObj: selectedVideoObj,
+                updateVideoList: updateVideos,
               ))
         ],
       ),

@@ -160,6 +160,13 @@ const kDataCount = "count";
 const kDataImageId = "imageid";
 const kDataTimageId = "timageid";
 const kDataTotalLikes = "totallikes";
+const kDataTotal_Likes = "total likes";
+const kDataTotalDislikes = "totaldislikes";
+const kDataTotal_Dislikes = "total dislikes";
+const kDataTotalLikeOrDislike = "totallikeordislike";
+const kDataLikeOrDsislike = "likeordislike";
+const kDataLikev = "likev";
+const kDataTotalViews = "totalviews";
 
 // ************************************Navigation Samples************************
 // Source: https://pub.dev/packages/page_transition
